@@ -53,8 +53,12 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
+
+
+//TODO: Move this BL in service
 using var serviceScope = app.Services.CreateScope();
 var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
+var userManager = serviceScope.ServiceProvider.GetService<UserManager<User>>();
 var roles = context.Roles.ToList();
 var users = context.Users.Include(x => x.Roles).ToList();
 var systemUsers = builder.Configuration.GetSection("SystemUsers");
@@ -65,18 +69,34 @@ foreach (var roleType in Enum.GetValues<RoleType>())
         .FirstOrDefault();
     if(role == null)
     {
-        context.Roles.Add(new Role
+        role = new Role
         {
             Name = roleType.ToString(),
             NormalizedName = roleType.ToString().ToUpper(),
             Type = roleType
-        });
+        };
+        context.Roles.Add(role);
     }
     var systemUser = systemUsers.GetSection(roleType.ToString());
     var user = users.Where(u => u.Roles.Any(r => r.Role.Type == roleType)).FirstOrDefault();
     if(user == null)
     {
-        Console.WriteLine("xd");
+        var systemUserLogin = systemUser.GetSection("Login").Value;
+        var systemUserPassword = systemUser.GetSection("Password").Value;
+
+        user = new User
+        {
+            Email = systemUserLogin,
+            UserName = systemUserLogin,
+            EmailConfirmed = true,
+        };
+        var userRole = new UserRole
+        {
+            Role = role,
+            User = user
+        };
+        user.Roles = new List<UserRole>() { userRole };
+        await userManager.CreateAsync(user, systemUserPassword);
     }
 }
 context.SaveChanges();
