@@ -83,6 +83,10 @@ foreach (var roleType in Enum.GetValues<RoleType>())
     {
         var systemUserLogin = systemUser.GetSection("Login").Value;
         var systemUserPassword = systemUser.GetSection("Password").Value;
+        if(systemUserLogin == null || systemUserPassword == null)
+        {
+            continue;
+        }
 
         user = new User
         {

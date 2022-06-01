@@ -13,6 +13,8 @@ namespace Dev_proc.Models.Identity
         [Display(Name = "Dean")]
         Dean = 1,
         [Display(Name = "Company")]
-        Company = 2
+        Company = 2,
+        [Display(Name = "Student")]
+        Student = 3
     }
 }

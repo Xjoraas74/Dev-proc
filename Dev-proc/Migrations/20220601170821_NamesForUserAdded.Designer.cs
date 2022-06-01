@@ -4,6 +4,7 @@ using Dev_proc.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dev_proc.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220601170821_NamesForUserAdded")]
+    partial class NamesForUserAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,23 +23,6 @@ namespace Dev_proc.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("Dev_proc.Models.Data.UploadedFile", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Path")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Files");
-                });
 
             modelBuilder.Entity("Dev_proc.Models.Identity.Role", b =>
                 {
@@ -116,9 +101,6 @@ namespace Dev_proc.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ResumeId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Secondname")
                         .HasColumnType("nvarchar(max)");
 
@@ -144,8 +126,6 @@ namespace Dev_proc.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("ResumeId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -255,15 +235,6 @@ namespace Dev_proc.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Dev_proc.Models.Identity.User", b =>
-                {
-                    b.HasOne("Dev_proc.Models.Data.UploadedFile", "Resume")
-                        .WithMany()
-                        .HasForeignKey("ResumeId");
-
-                    b.Navigation("Resume");
                 });
 
             modelBuilder.Entity("Dev_proc.Models.Identity.UserRole", b =>

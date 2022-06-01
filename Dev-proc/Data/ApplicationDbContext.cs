@@ -1,4 +1,5 @@
-﻿using Dev_proc.Models.Identity;
+﻿using Dev_proc.Models.Data;
+using Dev_proc.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace Dev_proc.Data
         public override DbSet<User> Users { get; set; }
         public override DbSet<Role> Roles { get; set; }
         public override DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<UploadedFile> Files { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,0 +1,12 @@
+﻿@model Dev_proc.Models.ViewModels.UserProfileViewModel
+@{
+	ViewData["Title"] = Model.Fullname;
+}
+
+<div class="text-left">
+	<p class="h3">@Model.Email</p>
+	<p class="h4">@Model.Surname</p>
+	<p class="h4">@Model.Firstname</p>
+	<p class="h4">@Model.Secondname</p>
+	<a href='@Url.Action("UploadResumeForStudent", new {studentId = @Model.StudentId})'>Upload Resume</a>
+</div>
