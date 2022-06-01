@@ -1,0 +1,15 @@
+﻿@model Dev_proc.Models.ViewModels.ResumeFileViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<form asp-action="UploadResumeForStudentPost" asp-controller="User" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="StudentId" />
+    <p>
+        <input name="Resume" type="file" class="form-control" />
+    </p>
+    <p>
+        <input type="submit" value="Добавить" />
+    </p>
+</form>
