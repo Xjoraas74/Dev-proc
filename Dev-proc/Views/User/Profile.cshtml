@@ -1,6 +1,6 @@
-﻿@model Dev_proc.Models.ViewModels.UserProfileViewModel
+﻿@model Dev_proc.Models.Identity.User
 @{
-	ViewData["Title"] = Model.Fullname;
+	ViewData["Title"] = Model.FullName;
 }
 
 <div class="text-left">
@@ -8,5 +8,13 @@
 	<p class="h4">@Model.Surname</p>
 	<p class="h4">@Model.Firstname</p>
 	<p class="h4">@Model.Secondname</p>
-	<a href='@Url.Action("UploadResumeForStudent", new {studentId = @Model.StudentId})'>Upload Resume</a>
+	@if(Model.Resume == null){
+		<a href='@Url.Action("UploadResumeForStudent", new {userId = @Model.Id})'>Upload Resume</a>
+	}
+	else
+	{
+		<p class="h4">Your resume: @Model.Resume.Name</p>
+		<a href='@Url.Action("DeleteResumeForStudent", new {userId = @Model.Id})'>Delete Resume</a>
+	}
+	
 </div>

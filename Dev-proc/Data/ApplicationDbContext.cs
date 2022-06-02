@@ -28,10 +28,13 @@ namespace Dev_proc.Data
                 .WithMany(b => b.Roles)
                 .HasForeignKey(p => p.UserId);
 
+
             modelBuilder.Entity<UserRole>()
                 .HasOne(p => p.Role)
                 .WithMany(b => b.Users)
                 .HasForeignKey(p => p.RoleId);
+                
+
         }
     }
 }

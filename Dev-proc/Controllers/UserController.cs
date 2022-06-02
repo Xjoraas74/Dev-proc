@@ -1,7 +1,9 @@
 ﻿using Dev_proc.Constants.Configuration;
 using Dev_proc.Data;
+using Dev_proc.Models.Data;
 using Dev_proc.Models.Identity;
 using Dev_proc.Models.ViewModels;
+using Dev_proc.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -16,14 +18,17 @@ namespace Dev_proc.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ApplicationDbContext _context;
+        private readonly IFileService _fileService;
 
         public UserController(UserManager<User> userManager,
             SignInManager<User> signInManager,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            IFileService fileService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _context= context;
+            _context = context;
+            _fileService = fileService;
         }
 
         [Route("")]
@@ -34,16 +39,17 @@ namespace Dev_proc.Controllers
             {
                 return NotFound();
             }
-            User currentUser = await _userManager.GetUserAsync(User);
-            return View("Profile", new UserProfileViewModel
+            var userId = _userManager.GetUserId(User);
+            if (userId == null)
             {
-                StudentId = currentUser.Id,
-                Firstname = currentUser.Firstname,
-                Secondname = currentUser.Secondname,
-                Surname = currentUser.Surname,
-                Fullname = currentUser.FullName,
-                Email = currentUser.Email
-            });
+                return NotFound("User doesn't exists");
+            }
+            User currentUser = await _userManager.Users
+                .Include(u => u.Resume)
+                .Where(u => u.Id == Guid.Parse(userId))
+                .FirstOrDefaultAsync();
+
+            return View("Profile", currentUser);
 
         }
         [Route("{id:guid}")]
@@ -55,35 +61,75 @@ namespace Dev_proc.Controllers
             {
                 return NotFound();
             }
-            var user = await _context.Users.Where(x=>x.Id==id).FirstOrDefaultAsync();
+            var user = await _context.Users
+                .Include(u => u.Resume)
+                .Where(x => x.Id == id).FirstOrDefaultAsync();
             if (user == null)
             {
                 return NotFound();
             }
-            return View(new UserProfileViewModel
-            {
-                StudentId=user.Id,
-                Firstname = user.Firstname,
-                Secondname = user.Secondname,
-                Surname = user.Surname,
-                Fullname = user.FullName,
-                Email = user.Email
-            });
+            return View("Profile", currentUser);
         }
-        [Route("upload_resume/{studentId:guid}")]
+        [Route("upload_resume/{userId:guid}")]
         [Authorize]
         [HttpGet]
-        public async Task<IActionResult> UploadResumeForStudent(Guid studentId)
+        public async Task<IActionResult> UploadResumeForStudent(Guid userId)
         {
-            var model = new ResumeFileViewModel {StudentId = studentId};
+            var user = await _context.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var model = new ResumeFileViewModel { StudentId = userId };
             return View(model);
         }
-        
+
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> UploadResumeForStudentPost(Guid studentId, ResumeFileViewModel model)
+        public async Task<IActionResult> UploadResumeForStudentPost(ResumeFileViewModel model)
         {
-            return View(model);
+            try
+            {
+                await _fileService.UploadResume(model);
+            }
+            catch (ArgumentNullException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            TempData["Success"] = "Resume uploaded";
+            return RedirectToAction("Profile", new { id = model.StudentId });
+        }
+
+        [Route("delete_resume/{userId:guid}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteResumeForStudent(Guid userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Resume)
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return NotFound();
+            }
+            try
+            {
+                await _fileService.DeleteResume(user.Resume);
+            }
+            catch (ArgumentNullException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            TempData["Success"] = "Resume deleted";
+            return RedirectToAction("Profile", new { id = userId });
         }
     }
 }

@@ -1,6 +1,7 @@
 using Dev_proc.Constants.Configuration;
 using Dev_proc.Data;
 using Dev_proc.Models.Identity;
+using Dev_proc.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ builder.Services.AddDefaultIdentity<User>(options =>
     .AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddScoped<IFileService, FileService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

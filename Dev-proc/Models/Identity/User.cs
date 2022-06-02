@@ -10,8 +10,8 @@ namespace Dev_proc.Models.Identity
         public string? Surname { get; set; }//Фамилия
         public string? Firstname { get; set; }//Имя
         public string? Secondname { get; set; }//Отчество
-        public UploadedFile? Resume { get; set; }
         public Guid? ResumeId { get; set; }
+        public UploadedFile? Resume { get; set; }
         [NotMapped]
         public string FullName => $"{Surname} {Firstname} {Secondname}";
     }
