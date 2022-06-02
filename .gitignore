@@ -9,7 +9,7 @@
 *.user
 *.userosscache
 *.sln.docstates
-./Dev-proc/files/resumes/*
+Dev-proc/files/resumes/bfb038c8-3adf-4a4e-7c89-08da417d3a09/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -362,3 +362,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+Dev-proc/files/resumes/bfb038c8-3adf-4a4e-7c89-08da417d3a09/babanov.txt
