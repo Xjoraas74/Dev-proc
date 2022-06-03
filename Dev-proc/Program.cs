@@ -1,9 +1,7 @@
-using Dev_proc.Constants.Configuration;
 using Dev_proc.Data;
 using Dev_proc.Models.Identity;
 using Dev_proc.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,6 +57,7 @@ app.MapRazorPages();
 //TODO: Move this BL in service
 using var serviceScope = app.Services.CreateScope();
 var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
+context.Database.Migrate(); // create and migrate a database
 var userManager = serviceScope.ServiceProvider.GetService<UserManager<User>>();
 var roles = context.Roles.ToList();
 var users = context.Users.Include(x => x.Roles).ToList();
