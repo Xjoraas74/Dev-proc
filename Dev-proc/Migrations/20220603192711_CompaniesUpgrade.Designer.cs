@@ -4,6 +4,7 @@ using Dev_proc.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dev_proc.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220603192711_CompaniesUpgrade")]
+    partial class CompaniesUpgrade
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,32 +47,6 @@ namespace Dev_proc.Migrations
                         .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Companies");
-                });
-
-            modelBuilder.Entity("Dev_proc.Models.CompanyModels.Position", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("AvailablePlaces")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("Positions");
                 });
 
             modelBuilder.Entity("Dev_proc.Models.Data.UploadedFile", b =>
@@ -325,17 +301,6 @@ namespace Dev_proc.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Dev_proc.Models.CompanyModels.Position", b =>
-                {
-                    b.HasOne("Dev_proc.Models.CompanyModels.Company", "Company")
-                        .WithMany("Positions")
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Company");
-                });
-
             modelBuilder.Entity("Dev_proc.Models.Data.UploadedFile", b =>
                 {
                     b.HasOne("Dev_proc.Models.Identity.User", "User")
@@ -398,11 +363,6 @@ namespace Dev_proc.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Dev_proc.Models.CompanyModels.Company", b =>
-                {
-                    b.Navigation("Positions");
                 });
 
             modelBuilder.Entity("Dev_proc.Models.Identity.Role", b =>

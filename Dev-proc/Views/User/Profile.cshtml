@@ -1,20 +1,47 @@
-﻿@model Dev_proc.Models.Identity.User
+﻿@using Dev_proc.Constants.Configuration
+@using Dev_proc.Models.Identity
+@using Microsoft.AspNetCore.Identity
+@model Dev_proc.Models.Identity.User
 @{
 	ViewData["Title"] = Model.FullName;
 }
 
 <div class="text-left">
-	<p class="h3">@Model.Email</p>
-	<p class="h4">@Model.Surname</p>
-	<p class="h4">@Model.Firstname</p>
-	<p class="h4">@Model.Secondname</p>
-	@if(Model.Resume == null){
-		<a href='@Url.Action("UploadResumeForStudent", new {userId = @Model.Id})'>Upload Resume</a>
+	@if (@Model.Company != null)
+	{
+		<p class="h3">@Model.Company.Name</p>
+		<a href='@Url.Action("AddPositionToCompany","Company", new {companyId = @Model.Company.Id})'>Create position</a>
+		@*TODO: add button to edit *@
+
+		@foreach (var position in @Model.Company.Positions)
+		{
+			<div class="card mb-3">
+				<div class="card-header">@position.Name  @position.AvailablePlaces</div>
+				<div class="card-body">
+					<div class="card-text">@position.Description</div>
+					<div class="card-body">
+						<a href='@Url.Action("EditPosition","Position",new {positionId = position.Id})' class="btn btn-primary">Edit</a>
+						<a href='@Url.Action("DeletePosition","Position",new {positionId = position.Id})' class="btn btn-danger">Delete</a>
+					</div>	
+				</div>				
+			</div>
+		}
+
 	}
 	else
 	{
-		<p class="h4">Your resume: @Model.Resume.Name</p>
-		<a href='@Url.Action("DeleteResumeForStudent", new {userId = @Model.Id})'>Delete Resume</a>
+		<p class="h3">@Model.Email</p>
+		<p class="h4">@Model.Surname</p>
+		<p class="h4">@Model.Firstname</p>
+		<p class="h4">@Model.Secondname</p>
+		@if (Model.Resume == null)
+		{
+			<a href='@Url.Action("UploadResumeForStudent", new {userId = @Model.Id})'>Upload Resume</a>
+		}
+		else
+		{
+			<p class="h4">Your resume: @Model.Resume.Name</p>
+			<a href='@Url.Action("DeleteResumeForStudent", new {userId = @Model.Id})'>Delete Resume</a>
+		}
 	}
-	
 </div>

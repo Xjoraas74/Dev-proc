@@ -1,0 +1,21 @@
+﻿@using Dev_proc.Models.CompanyModels
+@model Company
+@{
+	ViewData["Title"] = "Companies Page";
+}
+
+<div class="text-center">
+	<h1 class="display-4">@Model.Name</h1>
+	@if (Model.Comment != null)
+	{
+		<figure class="text-left">
+			<blockquote class="blockquote">
+				<p>About company:</p>
+			</blockquote>
+			<figcaption class="blockquote-footer">
+				@Model.Comment
+			</figcaption>
+		</figure>
+	}
+
+</div>

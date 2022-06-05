@@ -21,6 +21,7 @@ namespace Dev_proc.Constants.Configuration
 
         public const string AdminAndDean = Administrator + "," + Dean;
         public const string AdminAndCompany = Administrator + "," + Company;
+        public const string DeanAndCompany = Company + "," + Dean;
 
     }
 }

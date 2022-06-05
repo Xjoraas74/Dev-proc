@@ -46,6 +46,7 @@ namespace Dev_proc.Controllers
             }
             User currentUser = await _userManager.Users
                 .Include(u => u.Resume)
+                .Include(u => u.Company).ThenInclude(c => c.Positions)
                 .Where(u => u.Id == Guid.Parse(userId))
                 .FirstOrDefaultAsync();
 
@@ -57,18 +58,19 @@ namespace Dev_proc.Controllers
         public async Task<IActionResult> Profile(Guid id)
         {
             User currentUser = await _userManager.GetUserAsync(User);
-            if (!User.IsInRole(ApplicationRoleNames.AdminAndDean) && currentUser.Id != id)
+            if (currentUser.Id != id && !User.IsInRole(ApplicationRoleNames.Administrator))
             {
                 return NotFound();
             }
             var user = await _context.Users
                 .Include(u => u.Resume)
+                .Include(u=>u.Company).ThenInclude(c=>c.Positions)
                 .Where(x => x.Id == id).FirstOrDefaultAsync();
             if (user == null)
             {
                 return NotFound();
             }
-            return View("Profile", currentUser);
+            return View("Profile", user);
         }
         [Route("upload_resume/{userId:guid}")]
         [Authorize]

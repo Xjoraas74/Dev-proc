@@ -1,0 +1,21 @@
+﻿@using Dev_proc.Models.ViewModels.CompanyViews
+@model AddPositionViewModel
+@{
+    ViewData["Title"] = "Companies Page";
+}
+
+<form asp-action="AddPositionToCompanyPost" asp-controller="Company" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="CompanyId" value="@Model.CompanyId" id="uploadCompanyId"/>
+    <p>
+        <input name="Name" type="text" placeholder = "Position name" class="form-control" />
+    </p>
+    <p>
+        <input name="Description" type="text" placeholder = "Position description" class="form-control" />
+    </p>
+    <p>
+        <input name="AvailablePlaces" type="number" placeholder = "Number of available places" min="1" class="form-control" />
+    </p>
+    <p>
+        <input type="submit" value="Добавить" />
+    </p>
+</form>
