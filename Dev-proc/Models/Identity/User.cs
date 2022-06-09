@@ -8,6 +8,7 @@ namespace Dev_proc.Models.Identity
     public class User : IdentityUser<Guid>
     {
         public ICollection<UserRole> Roles { get; set; }
+        public ICollection<Candidature> Candidatures { get; set; }
         public string? Surname { get; set; }//Фамилия
         public string? Firstname { get; set; }//Имя
         public string? Secondname { get; set; }//Отчество

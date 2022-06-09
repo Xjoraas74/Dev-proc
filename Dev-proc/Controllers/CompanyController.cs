@@ -35,7 +35,7 @@ namespace Dev_proc.Controllers
         {
             var companies = await _context.Companies
                 .Include(c=>c.User)
-                .Include(c => c.Positions)
+                .Include(c => c.Positions).ThenInclude(p=>p.Applications)
                 .ToListAsync();
             return View(companies);
         }

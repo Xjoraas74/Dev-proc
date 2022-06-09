@@ -1,7 +1,10 @@
 ﻿using Dev_proc.Constants.Configuration;
 using Dev_proc.Data;
+using Dev_proc.Models.CompanyModels;
+using Dev_proc.Models.Identity;
 using Dev_proc.Models.ViewModels.PositionViews;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,9 +14,12 @@ namespace Dev_proc.Controllers
 	public class PositionController : Controller
 	{
 		private readonly ApplicationDbContext _context;
-		public PositionController(ApplicationDbContext context)
+        private readonly UserManager<User> _userManager;
+        public PositionController(ApplicationDbContext context,
+            UserManager<User> userManager)
 		{
 			_context = context;
+            _userManager = userManager;
 		}
 		[Route("delete/{positionId:guid}")]
 		public async Task<IActionResult> DeletePosition(Guid positionId)
@@ -72,6 +78,54 @@ namespace Dev_proc.Controllers
             await _context.SaveChangesAsync();
             TempData["Success"] = "Position edited";
             return RedirectToAction("Profile", "User", new { id = position.Company.UserId });
+        }
+        [Route("{positionId:guid}/submit_resume")]
+        [Authorize(Roles = ApplicationRoleNames.Student)]
+        public async Task<IActionResult> SubmitResumeForPosition(Guid positionId)
+        {
+            var userId = _userManager.GetUserId(User);
+            if(userId == null)
+            {
+                return NotFound();
+            }
+            var currentUser = await _context.Users
+                .Include(u=>u.Resume)
+                .Where(u=>u.Id == Guid.Parse(userId))
+                .FirstOrDefaultAsync();
+            if (currentUser == null)
+            {
+                return NotFound();
+            }
+            if(currentUser.Resume == null)
+            {
+                TempData["Error"] = "You need to upload the resume in your profile";
+                return RedirectToAction("CompaniesList", "Company"); 
+            }
+            var position = await _context.Positions
+                .Include(p=>p.Applications)
+                .Where(p=>p.Id == positionId).FirstOrDefaultAsync();
+            if (position == null)
+            {
+                return NotFound();
+            }
+            var application = await _context.Candidatures
+                .Where(a => a.UserId == currentUser.Id && a.PositionId == position.Id)
+                .FirstOrDefaultAsync();
+
+            if(application!= null)
+            {
+                TempData["Error"] = "Resume already submitted";
+                return RedirectToAction("CompaniesList", "Company");
+            }
+            Candidature candidature = new Candidature
+            {
+                Position = position,
+                User = currentUser
+            };
+            _context.Candidatures.Add(candidature);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Resume submitted successfully";
+            return RedirectToAction("CompaniesList", "Company");
         }
     }
 }

@@ -3,9 +3,21 @@
 @using Dev_proc.Models.Identity
 @using Microsoft.AspNetCore.Identity
 @model List<Company>
+@inject UserManager<User> _userManager;
 @{
-	var asqwe=User.IsInRole(ApplicationRoleNames.Student);
-	var asqw1e=User.IsInRole(ApplicationRoleNames.Dean);
+	var asqwe = User.IsInRole(ApplicationRoleNames.Student);
+	var asqw1e = User.IsInRole(ApplicationRoleNames.Dean);
+}
+@functions {
+	public bool checkResumeIsSubmitted(Position position)
+	{
+		var userId = _userManager.GetUserId(User);
+		if (userId == null)
+		{
+			return false;
+		}
+		return position.Applications.Any(x => x.UserId == Guid.Parse(userId));
+	}
 }
 
 <div class="text-left">
@@ -22,12 +34,20 @@
 					<div class="card-text">@position.Description</div>
 					@if (User.IsInRole(ApplicationRoleNames.Student))
 					{
-						<a href="#" class="btn btn-primary">Submit your CV</a>
+						@if (checkResumeIsSubmitted(position))
+						{
+							<a href='@Url.Action("endpoint", new {positionId = position.Id})' class="btn btn-secondary">Check your candidacy</a>
+						}
+						else
+						{
+							<a href='@Url.Action("SubmitResumeForPosition","Position", new {positionId = position.Id})' class="btn btn-primary">Submit your CV</a>
+						}
+
 					}
 				</div>
 
 			</div>
 		}
 		<hr>
-	 } 
+	}
 </div>

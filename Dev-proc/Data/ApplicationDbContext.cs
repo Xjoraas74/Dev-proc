@@ -21,6 +21,8 @@ namespace Dev_proc.Data
         public DbSet<UploadedFile> Files { get; set; }
         public DbSet<Company> Companies { get; set; }   
         public DbSet<Position> Positions { get; set; }
+        public DbSet<Candidature> Candidatures { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,7 +38,17 @@ namespace Dev_proc.Data
                 .HasOne(p => p.Role)
                 .WithMany(b => b.Users)
                 .HasForeignKey(p => p.RoleId);
-                
+
+            modelBuilder.Entity<Candidature>()
+               .HasOne(p => p.User)
+               .WithMany(b => b.Candidatures)
+               .HasForeignKey(p => p.UserId);
+
+
+            modelBuilder.Entity<Candidature>()
+                .HasOne(p => p.Position)
+                .WithMany(b => b.Applications)
+                .HasForeignKey(p => p.PositionId);
 
         }
     }
