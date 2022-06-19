@@ -12,7 +12,9 @@
 		<p class="h3">@Model.Company.Name</p>
 		<a href='@Url.Action("AddPositionToCompany","Company", new {companyId = @Model.Company.Id})'>Create position</a>
 		@*TODO: add button to edit *@
-
+		if(@Model.Company.Positions.Count()>0){
+			<a href='@Url.Action("ApplicationsForThisPosition","Position")' class="btn btn-secondary">All candidates</a>
+		}
 		@foreach (var position in @Model.Company.Positions)
 		{
 			<div class="card mb-3">
@@ -22,6 +24,7 @@
 					<div class="card-body">
 						<a href='@Url.Action("EditPosition","Position",new {positionId = position.Id})' class="btn btn-primary">Edit</a>
 						<a href='@Url.Action("DeletePosition","Position",new {positionId = position.Id})' class="btn btn-danger">Delete</a>
+						<a href='@Url.Action("ApplicationsForThisPosition","Position",new {positionId = position.Id})' class="btn btn-secondary">Candidates</a>
 					</div>	
 				</div>				
 			</div>

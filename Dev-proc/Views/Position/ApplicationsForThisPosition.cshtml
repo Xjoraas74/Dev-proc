@@ -1,0 +1,28 @@
+﻿@using Dev_proc.Models.ViewModels.PositionViews
+@model Dev_proc.Models.ViewModels.PositionViews.PositionAndCompanyViewModel
+@{
+	ViewData["Title"] = "Companies Page";
+}
+
+<div class="text-left">
+
+	<p class="h3">@Model.CompanyName</p>
+
+	@foreach (var position in @Model.positions)
+	{
+		<div class="card mb-3">
+			<div class="card-header">@position.Name  @position.AvailablePlaces</div>
+			<div class="card-body">
+				<div class="card-text">@position.Description</div>
+
+				@foreach (var application in position.Applications)
+				{
+					<div class="card-body">
+						<a href='@Url.Action("EditPosition","Position",new {positionId = position.Id})' class="btn btn-primary">@application.User.Email</a>
+					</div>
+				}				
+			</div>
+		</div>
+	}
+
+</div>

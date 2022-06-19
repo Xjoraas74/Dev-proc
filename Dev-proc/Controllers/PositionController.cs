@@ -10,33 +10,33 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dev_proc.Controllers
 {
-	[Route("position")]
-	public class PositionController : Controller
-	{
-		private readonly ApplicationDbContext _context;
+    [Route("position")]
+    public class PositionController : Controller
+    {
+        private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
         public PositionController(ApplicationDbContext context,
             UserManager<User> userManager)
-		{
-			_context = context;
+        {
+            _context = context;
             _userManager = userManager;
-		}
-		[Route("delete/{positionId:guid}")]
-		public async Task<IActionResult> DeletePosition(Guid positionId)
-		{
-			var position = await _context.Positions
-				.Include(p=>p.Company).ThenInclude(c=>c.User)
-				.Where(p => p.Id == positionId).FirstOrDefaultAsync();
-			if(position == null)
-			{
-				return NotFound();
-			}
-			var profileId = position.Company.UserId;
-			_context.Positions.Remove(position);
-			await _context.SaveChangesAsync();
-			TempData["Success"] = "Position deleted";
-			return RedirectToAction("Profile", "User", new {id = profileId });
-		}
+        }
+        [Route("delete/{positionId:guid}")]
+        public async Task<IActionResult> DeletePosition(Guid positionId)
+        {
+            var position = await _context.Positions
+                .Include(p => p.Company).ThenInclude(c => c.User)
+                .Where(p => p.Id == positionId).FirstOrDefaultAsync();
+            if (position == null)
+            {
+                return NotFound();
+            }
+            var profileId = position.Company.UserId;
+            _context.Positions.Remove(position);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Position deleted";
+            return RedirectToAction("Profile", "User", new { id = profileId });
+        }
         [Route("edit_position/{positionId:guid}")]
         [Authorize(Roles = ApplicationRoleNames.AdminAndCompany)]
         [HttpGet]
@@ -47,8 +47,8 @@ namespace Dev_proc.Controllers
             {
                 return NotFound();
             }
-            return View("EditPosition", new EditPositionViewModel 
-            { 
+            return View("EditPosition", new EditPositionViewModel
+            {
                 PositionId = positionId,
                 AvailablePlaces = position.AvailablePlaces,
                 Description = position.Description,
@@ -60,7 +60,7 @@ namespace Dev_proc.Controllers
         public async Task<IActionResult> EditPositionPost(EditPositionViewModel model)
         {
             var position = await _context.Positions
-                .Include(c=>c.Company)
+                .Include(c => c.Company)
                 .Where(c => c.Id == model.PositionId).FirstOrDefaultAsync();
             if (position == null)
             {
@@ -84,26 +84,26 @@ namespace Dev_proc.Controllers
         public async Task<IActionResult> SubmitResumeForPosition(Guid positionId)
         {
             var userId = _userManager.GetUserId(User);
-            if(userId == null)
+            if (userId == null)
             {
                 return NotFound();
             }
             var currentUser = await _context.Users
-                .Include(u=>u.Resume)
-                .Where(u=>u.Id == Guid.Parse(userId))
+                .Include(u => u.Resume)
+                .Where(u => u.Id == Guid.Parse(userId))
                 .FirstOrDefaultAsync();
             if (currentUser == null)
             {
                 return NotFound();
             }
-            if(currentUser.Resume == null)
+            if (currentUser.Resume == null)
             {
                 TempData["Error"] = "You need to upload the resume in your profile";
-                return RedirectToAction("CompaniesList", "Company"); 
+                return RedirectToAction("CompaniesList", "Company");
             }
             var position = await _context.Positions
-                .Include(p=>p.Applications)
-                .Where(p=>p.Id == positionId).FirstOrDefaultAsync();
+                .Include(p => p.Applications)
+                .Where(p => p.Id == positionId).FirstOrDefaultAsync();
             if (position == null)
             {
                 return NotFound();
@@ -112,7 +112,7 @@ namespace Dev_proc.Controllers
                 .Where(a => a.UserId == currentUser.Id && a.PositionId == position.Id)
                 .FirstOrDefaultAsync();
 
-            if(application!= null)
+            if (application != null)
             {
                 TempData["Error"] = "Resume already submitted";
                 return RedirectToAction("CompaniesList", "Company");
@@ -126,6 +126,25 @@ namespace Dev_proc.Controllers
             await _context.SaveChangesAsync();
             TempData["Success"] = "Resume submitted successfully";
             return RedirectToAction("CompaniesList", "Company");
+        }
+        [Route("{positionId:guid}/position_candidates")]
+        [Authorize(Roles = ApplicationRoleNames.Company)]
+        public async Task<IActionResult> ApplicationsForThisPosition(Guid positionId)
+        {
+            var position = await _context.Positions
+                .Include(x => x.Company)
+                .Include(x=> x.Applications).ThenInclude(a=>a.User)
+                .Where(x => x.Id == positionId).FirstOrDefaultAsync();
+            if (position == null)
+            {
+                return BadRequest("Position not found");
+            }
+            List<Position> positions = new List<Position>() { position };
+            return View(new PositionAndCompanyViewModel
+            {
+                CompanyName = position.Company.Name,
+                positions = positions
+            });
         }
     }
 }
