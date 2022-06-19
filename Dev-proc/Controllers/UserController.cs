@@ -44,7 +44,7 @@ namespace Dev_proc.Controllers
             {
                 return NotFound("User doesn't exists");
             }
-            User currentUser = await _userManager.Users
+            User? currentUser = await _userManager.Users
                 .Include(u => u.Resume)
                 .Include(u => u.Company).ThenInclude(c => c.Positions)
                 .Where(u => u.Id == Guid.Parse(userId))
