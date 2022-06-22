@@ -7,6 +7,7 @@
 @inject UserManager<User> _userManager;
 @{
 	var userId = _userManager.GetUserId(User);
+	int counter = 0;
 }
 @functions {
 	public bool checkResumeIsSubmitted(Position position)
@@ -23,31 +24,35 @@
 <div class="text-left">
 	@foreach (var company in @Model)
 	{
-		<p class="h2">@company.Name</p>
-
-		@foreach (var position in company.Positions)
-		{
-			<p>
-				<div class="card mb-3">
-					<div class="card-header">@position.Name @CshtmlHelper.AvailablePlacesToName(@position.AvailablePlaces)</div>
-					<div class="card-body">
-						<div class="card-text">@position.Description</div>
+		<a class="h2" data-bs-toggle="collapse" href="#@company.Id" role="button" aria-expanded="false" aria-controls="@company.Id">
+			@company.Name
+		</a>
+		<div class="collapse" id="@company.Id">
+			@foreach (var position in company.Positions)
+			{
+				<p>
+					<div class="card mb-3">
+						<div class="card-header">@position.Name @CshtmlHelper.AvailablePlacesToName(@position.AvailablePlaces)</div>
+						<div class="card-body">
+							<div class="card-text">@position.Description</div>
+						</div>
 					</div>
-				</div>
-				@if (User.IsInRole(ApplicationRoleNames.Student))
-				{
+					@if (User.IsInRole(ApplicationRoleNames.Student))
+					{
 
-					@if (checkResumeIsSubmitted(position))
-					{
-						<a href='@Url.Action("CheckYourCandidacy","Candidacy", new {userId = @userId, positionId = position.Id})' class="btn btn-secondary">Check your candidacy</a>
+						@if (checkResumeIsSubmitted(position))
+						{
+							<a href='@Url.Action("CheckYourCandidacy","Candidacy", new {userId = @userId, positionId = position.Id})' class="btn btn-secondary">Check your candidacy</a>
+						}
+						else
+						{
+							<a href='@Url.Action("SubmitResumeForPosition","Position", new {positionId = position.Id})' class="btn btn-primary">Submit your CV</a>
+						}
 					}
-					else
-					{
-						<a href='@Url.Action("SubmitResumeForPosition","Position", new {positionId = position.Id})' class="btn btn-primary">Submit your CV</a>
-					}
-				}
-			</p>
-		}
+				</p>
+			}
+		</div>
 		<hr>
 	}
 </div>
+
