@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 using Dev_proc.Models.CompanyModels;
+using Dev_proc.Models.DeanModels;
 
 namespace Dev_proc.Models.Identity
 {
@@ -16,6 +17,8 @@ namespace Dev_proc.Models.Identity
         public UploadedFile? Resume { get; set; }
         public Guid? CompanyId { get; set; }
         public Company? Company { get; set; }
+        public Guid? DeanId { get; set; }
+        public Dean? Dean { get; set; }
         [NotMapped]
         public string FullName => $"{Surname} {Firstname} {Secondname}";
     }
