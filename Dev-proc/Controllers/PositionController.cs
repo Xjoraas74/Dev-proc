@@ -163,6 +163,6 @@ namespace Dev_proc.Controllers
                 CompanyName = company.Name,
                 positions = company.Positions.ToList()
             });
-        }
+        }        
     }
 }

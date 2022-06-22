@@ -1,4 +1,5 @@
-﻿@using Dev_proc.Models.Enums
+﻿@using Dev_proc.Constants
+@using Dev_proc.Models.Enums
 @using Dev_proc.Models.ViewModels.PositionViews
 @model Dev_proc.Models.ViewModels.PositionViews.PositionAndCompanyViewModel
 @{
@@ -33,7 +34,7 @@
 	@foreach (var position in @Model.positions)
 	{
 		<div class="card mb-3">
-			<div class="card-header">Position name: @position.Name  @position.AvailablePlaces</div>
+			<div class="card-header">Position name: @position.Name @CshtmlHelper.AvailablePlacesToName(@position.AvailablePlaces)</div>
 			<div class="card-body">
 				<div class="card-text">Description: @position.Description</div>
 				<p class="h4">Candidates:</p>

@@ -1,0 +1,46 @@
+﻿@using Dev_proc.Constants
+@using Dev_proc.Models.Enums
+@using Dev_proc.Models.ViewModels.CandidacyViews
+@using Dev_proc.Models.ViewModels.PositionViews
+@model Dev_proc.Models.Identity.User
+@{
+	ViewData["Title"] = "Companies Page";
+}
+
+@functions {
+	public string candidatureStatus(CandidateStatus status)
+	{
+		switch (status)
+		{
+			case CandidateStatus.New:
+				return "btn-primary";
+			case CandidateStatus.InProcess:
+				return "btn-warning";
+			case CandidateStatus.Accepted:
+				return "btn-success";
+			case CandidateStatus.Denied:
+				return "btn-danger";
+			case CandidateStatus.Undefiend:
+				return "btn-dark";
+			default:
+				return "btn-info";
+		}
+
+	}
+}
+
+<div class="text-left">
+	@foreach (var candidature in @Model.Candidatures)
+	{
+		<p>
+		<div class="card mb-3">
+			<div class="card-header">Position name: @candidature.Position.Name @CshtmlHelper.AvailablePlacesToName(candidature.Position.AvailablePlaces)</div>
+			<div class="card-body">
+				<div class="card-text">Description: @candidature.Position.Description</div>			
+			</div>
+		</div>
+		<a href='@Url.Action("CheckYourCandidacy","Candidacy",new {userId = @Model.Id, positionId = candidature.Position.Id})' class="btn @candidatureStatus(candidature.Status)">Check</a>
+		</p>
+		<hr />
+	}
+</div>

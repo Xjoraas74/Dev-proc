@@ -1,12 +1,12 @@
-﻿@using Dev_proc.Constants.Configuration
+﻿@using Dev_proc.Constants
+@using Dev_proc.Constants.Configuration
 @using Dev_proc.Models.CompanyModels
 @using Dev_proc.Models.Identity
 @using Microsoft.AspNetCore.Identity
 @model List<Company>
 @inject UserManager<User> _userManager;
 @{
-	var asqwe = User.IsInRole(ApplicationRoleNames.Student);
-	var asqw1e = User.IsInRole(ApplicationRoleNames.Dean);
+	var userId = _userManager.GetUserId(User);
 }
 @functions {
 	public bool checkResumeIsSubmitted(Position position)
@@ -24,29 +24,29 @@
 	@foreach (var company in @Model)
 	{
 		<p class="h2">@company.Name</p>
-		@*TODO: add button to edit *@
 
 		@foreach (var position in company.Positions)
 		{
-			<div class="card mb-3">
-				<div class="card-header">@position.Name  @position.AvailablePlaces</div>
-				<div class="card-body">
-					<div class="card-text">@position.Description</div>
-					@if (User.IsInRole(ApplicationRoleNames.Student))
-					{
-						@if (checkResumeIsSubmitted(position))
-						{
-							<a href='@Url.Action("endpoint", new {positionId = position.Id})' class="btn btn-secondary">Check your candidacy</a>
-						}
-						else
-						{
-							<a href='@Url.Action("SubmitResumeForPosition","Position", new {positionId = position.Id})' class="btn btn-primary">Submit your CV</a>
-						}
-
-					}
+			<p>
+				<div class="card mb-3">
+					<div class="card-header">@position.Name @CshtmlHelper.AvailablePlacesToName(@position.AvailablePlaces)</div>
+					<div class="card-body">
+						<div class="card-text">@position.Description</div>
+					</div>
 				</div>
+				@if (User.IsInRole(ApplicationRoleNames.Student))
+				{
 
-			</div>
+					@if (checkResumeIsSubmitted(position))
+					{
+						<a href='@Url.Action("CheckYourCandidacy","Candidacy", new {userId = @userId, positionId = position.Id})' class="btn btn-secondary">Check your candidacy</a>
+					}
+					else
+					{
+						<a href='@Url.Action("SubmitResumeForPosition","Position", new {positionId = position.Id})' class="btn btn-primary">Submit your CV</a>
+					}
+				}
+			</p>
 		}
 		<hr>
 	}

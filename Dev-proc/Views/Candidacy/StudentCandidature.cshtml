@@ -1,0 +1,34 @@
+﻿@using Dev_proc.Models.Enums
+@using Dev_proc.Models.ViewModels.CandidacyViews
+@using Dev_proc.Models.ViewModels.PositionViews
+@model CandidacyViewModel
+@{
+	ViewData["Title"] = "Companies Page";
+}
+
+<div class="text-left">
+	<p class="h4">Position: @Model.PositionName</p>
+	<p class="h4">User Email: @Model.Email</p>
+	@if (@Model.Resume != null)
+	{
+		<p class="h4">
+			User resume: @Model.Resume.Name
+			<a href='@Url.Action("DownloadResume","User", new {userId = @Model.UserId})' class="btn btn-info">Download Resume</a>
+		</p>
+	}
+	else
+	{
+		<p class="h4">User deleted his resume</p>
+	}
+	<p>
+		@*Candidate Status : @Enum.GetName(typeof(CandidateStatus), (int)@Model.CandidateStatus)*@
+		<select asp-for="CandidateStatus" asp-items="Html.GetEnumSelectList<CandidateStatus>()" class="form-control" disabled></select>
+	</p>
+	<p>
+		<textarea asp-for="Comment" type="text" placeholder="Comment" value="@Model.Comment" class="form-control" rows="3" disabled></textarea>
+	</p>
+	<p>
+		<a href='@Url.Action("CompaniesList","Company")' class="btn btn-primary">Back</a>
+		<a href='@Url.Action("DeleteYourCandidacy", new {candidatureId = @Model.CandidatureId})' class="btn btn-danger">Delete</a>
+	</p>
+</div>

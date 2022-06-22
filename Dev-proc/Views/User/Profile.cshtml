@@ -1,4 +1,5 @@
 ﻿@using Dev_proc.Constants.Configuration
+@using Dev_proc.Constants
 @using Dev_proc.Models.Identity
 @using Microsoft.AspNetCore.Identity
 @model Dev_proc.Models.Identity.User
@@ -13,25 +14,25 @@
 		<p>
 			<a href='@Url.Action("AddPositionToCompany","Company", new {companyId = @Model.Company.Id})' class="btn btn-primary">Create position</a>
 			@*TODO: add button to edit *@
-			@if(@Model.Company.Positions.Count()>0){
-			<a href='@Url.Action("ApplicationsForThisCompany","Position", new {companyId = @Model.Company.Id})' class="btn btn-secondary">All candidates</a>
+			@if (@Model.Company.Positions.Count() > 0)
+			{
+				<a href='@Url.Action("ApplicationsForThisCompany","Position", new {companyId = @Model.Company.Id})' class="btn btn-secondary">All candidates</a>
 			}
 		</p>
 		@foreach (var position in @Model.Company.Positions)
 		{
-			<div class="card mb-3">
-				<div class="card-header">@position.Name  @position.AvailablePlaces</div>
-				<div class="card-body">
-					<div class="card-text">@position.Description</div>
+			<p>
+				<div class="card mb-3">
+					<div class="card-header">@position.Name @CshtmlHelper.AvailablePlacesToName(position.AvailablePlaces)</div>
 					<div class="card-body">
-						<a href='@Url.Action("EditPosition","Position",new {positionId = position.Id})' class="btn btn-primary">Edit</a>
-						<a href='@Url.Action("DeletePosition","Position",new {positionId = position.Id})' class="btn btn-danger">Delete</a>
-						<a href='@Url.Action("ApplicationsForThisPosition","Position",new {positionId = position.Id})' class="btn btn-secondary">Candidates</a>
+						<div class="card-text">@position.Description</div>
 					</div>
 				</div>
-			</div>
+				<a href='@Url.Action("EditPosition","Position",new {positionId = position.Id})' class="btn btn-info">Edit</a>
+				<a href='@Url.Action("DeletePosition","Position",new {positionId = position.Id})' class="btn btn-danger">Delete</a>
+				<a href='@Url.Action("ApplicationsForThisPosition","Position",new {positionId = position.Id})' class="btn btn-secondary">Candidates</a>
+			</p>
 		}
-
 	}
 	else
 	{
@@ -46,8 +47,12 @@
 		else
 		{
 			<p class="h4">Your resume: @Model.Resume.Name</p>
-			<a href='@Url.Action("DeleteResumeForStudent", new {userId = @Model.Id})'>Delete Resume</a>
-			<a href='@Url.Action("DownloadResume", new {userId = @Model.Id})'>Download Resume</a>
+			<p>
+				<a href='@Url.Action("DeleteResumeForStudent", new {userId = @Model.Id})' class="btn btn-danger">Delete Resume</a>
+				<a href='@Url.Action("DownloadResume", new {userId = @Model.Id})' class="btn btn-info">Download Resume</a>
+				<a href='@Url.Action("CandidaturesForThisUser","Candidacy", new {userId = @Model.Id})' class="btn btn-primary">All your candidatures</a>
+			</p>
 		}
+
 	}
 </div>
