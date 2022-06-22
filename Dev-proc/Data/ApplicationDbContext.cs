@@ -20,6 +20,7 @@ namespace Dev_proc.Data
         public override DbSet<Role> Roles { get; set; }
         public override DbSet<UserRole> UserRoles { get; set; }
         public DbSet<UploadedFile> Files { get; set; }
+        public DbSet<PracticeDiary> PracticeDiaries { get; set; }
         public DbSet<Company> Companies { get; set; }   
         public DbSet<Position> Positions { get; set; }
         public DbSet<Candidature> Candidatures { get; set; }

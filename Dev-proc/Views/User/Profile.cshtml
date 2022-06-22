@@ -39,22 +39,55 @@
 	}
 	else
 	{
-		<p class="h3">@Model.Email</p>
-		<p class="h4">@Model.Surname</p>
-		<p class="h4">@Model.Firstname</p>
-		<p class="h4">@Model.Secondname</p>
+		<div class="card">
+			<div class="card-body">
+				<p class="h3">@Model.Email</p>
+				<p class="h4">@Model.Surname</p>
+				<p class="h4">@Model.Firstname</p>
+				<p class="h4">@Model.Secondname</p>
+			</div>
+		</div>
 		@if (Model.Resume == null)
 		{
-			<a href='@Url.Action("UploadResumeForStudent", new {userId = @Model.Id})'>Upload Resume</a>
+			<div class="card">
+				<div class="card-body">
+					<a href='@Url.Action("UploadResumeForStudent", new {userId = @Model.Id})'>Upload Resume</a>
+				</div>
+			</div>
 		}
 		else
 		{
-			<p class="h4">Your resume: @Model.Resume.Name</p>
-			<p>
-				<a href='@Url.Action("DeleteResumeForStudent", new {userId = @Model.Id})' class="btn btn-danger">Delete Resume</a>
-				<a href='@Url.Action("DownloadResume", new {userId = @Model.Id})' class="btn btn-info">Download Resume</a>
-				<a href='@Url.Action("CandidaturesForThisUser","Candidacy", new {userId = @Model.Id})' class="btn btn-primary">All your candidatures</a>
-			</p>
+			<div class="card">
+				<div class="card-body">
+					<p class="h4">Your resume: @Model.Resume.Name</p>
+					<p>
+						<a href='@Url.Action("DeleteResumeForStudent", new {userId = @Model.Id})' class="btn btn-danger">Delete Resume</a>
+						<a href='@Url.Action("DownloadResume", new {userId = @Model.Id})' class="btn btn-info">Download Resume</a>
+						<a href='@Url.Action("CandidaturesForThisUser","Candidacy", new {userId = @Model.Id})' class="btn btn-primary">All your candidatures</a>
+					</p>
+				</div>
+			</div>
+		}
+		@if (Model.PracticeDiary == null)
+		{
+			<div class="card">
+				<div class="card-body">
+					<a href='@Url.Action("UploadPracticeDiaryForStudent", new {userId = @Model.Id})'>Upload practice diary</a>
+				</div>
+			</div>
+		}
+		else
+		{
+			<div class="card">
+				<div class="card-body">
+					<p class="h4">Your practice diary: @Model.PracticeDiary.Name</p>
+					<p>
+						<a href='@Url.Action("DeletePracticeDiaryForStudent", new {userId = @Model.Id})' class="btn btn-danger">Delete practice diary</a>
+						<a href='@Url.Action("DownloadPracticeDiary", new {userId = @Model.Id})' class="btn btn-info">Download practice diary</a>
+						@*<a href='@Url.Action("CandidaturesForThisUser","Candidacy", new {userId = @Model.Id})' class="btn btn-primary">All your candidatures</a>*@
+					</p>
+				</div>
+			</div>
 		}
 
 	}

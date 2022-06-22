@@ -1,6 +1,7 @@
 ﻿using Dev_proc.Constants;
 using Dev_proc.Data;
 using Dev_proc.Models.Data;
+using Dev_proc.Models.Enums;
 using Dev_proc.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,9 @@ namespace Dev_proc.Services
     public interface IFileService
     {
         public Task UploadResume(ResumeFileViewModel resume);
+        public Task UploadPracticeDiary(ResumeFileViewModel practiceDiary);
         public Task DeleteResume(UploadedFile? resume);
+        public Task DeletePracticeDiary(PracticeDiary? practiceDiary);
     }
     public class FileService : IFileService
     {
@@ -45,7 +48,7 @@ namespace Dev_proc.Services
             {
                 await resume.Resume.CopyToAsync(fileStream);
             }
-            UploadedFile file = new UploadedFile { Name = resume.Resume.FileName, Path = path };
+            UploadedFile file = new UploadedFile { Name = resume.Resume.FileName, Path = path, User = student };
             await _context.Files.AddAsync(file);
             student.Resume = file;
             _context.Users.Update(student);
@@ -73,6 +76,62 @@ namespace Dev_proc.Services
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
+        }
+        public async Task DeletePracticeDiary(PracticeDiary practiceDiary)
+        {
+            if (practiceDiary == null)
+            {
+                throw new ArgumentNullException(nameof(practiceDiary));
+            }
+            if (practiceDiary.Path == null)
+            {
+                throw new ArgumentNullException(nameof(practiceDiary.Path));
+            }
+            var user = await _context.Users.Where(u => u.Id == practiceDiary.UserId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            DeleteFile(practiceDiary.Path);
+            user.PracticeDiary = null;
+            user.PracticeDiaryId = null;
+            _context.PracticeDiaries.Remove(practiceDiary);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+        }
+        public async Task UploadPracticeDiary(ResumeFileViewModel practiceDiary)
+        {
+            if (practiceDiary?.Resume == null)
+            {
+                throw new ArgumentNullException(nameof(practiceDiary));
+            }
+
+            var student = await _context.Users
+                .Include(s => s.PracticeDiary)
+                .Where(x => x.Id == practiceDiary.StudentId).FirstOrDefaultAsync();
+
+            if (student == null)
+            {
+                throw new ArgumentNullException(nameof(practiceDiary.StudentId));
+            }
+            if (student.PracticeDiary?.Name != null || student.PracticeDiary?.Path != null)
+            {
+                throw new Exception("Resume already exists");
+            }
+
+            string path = FolderPaths.PracticeDiaryFolder + practiceDiary.StudentId.ToString();
+            CreateDirectoryIfDoesntExists(path);
+            path += "/" + practiceDiary.Resume.FileName;
+            using (var fileStream = new FileStream(path, FileMode.Create))
+            {
+                await practiceDiary.Resume.CopyToAsync(fileStream);
+            }
+            PracticeDiary file = new PracticeDiary { Name = practiceDiary.Resume.FileName, Path = path, PracticeDiaryStatus = PracticeDiaryStatus.New, User = student };
+            await _context.PracticeDiaries.AddAsync(file);
+            student.PracticeDiary = file;
+            _context.Users.Update(student);
+            await _context.SaveChangesAsync();
         }
         private void CreateDirectoryIfDoesntExists(string path)
         {

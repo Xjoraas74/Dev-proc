@@ -15,6 +15,8 @@ namespace Dev_proc.Models.Identity
         public string? Secondname { get; set; }//Отчество
         public Guid? ResumeId { get; set; }
         public UploadedFile? Resume { get; set; }
+        public Guid? PracticeDiaryId { get; set; }
+        public PracticeDiary? PracticeDiary { get; set; }
         public Guid? CompanyId { get; set; }
         public Company? Company { get; set; }
         public Guid? DeanId { get; set; }

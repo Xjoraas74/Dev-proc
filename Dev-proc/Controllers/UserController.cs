@@ -50,6 +50,7 @@ namespace Dev_proc.Controllers
             }
             User? currentUser = await _userManager.Users
                 .Include(u => u.Resume)
+                .Include(u=>u.PracticeDiary)
                 .Include(u => u.Company).ThenInclude(c => c.Positions)
                 .Include(u => u.Dean)
                 .Where(u => u.Id == Guid.Parse(userId))
@@ -69,6 +70,7 @@ namespace Dev_proc.Controllers
             }
             var user = await _context.Users
                 .Include(u => u.Resume)
+                .Include(u => u.PracticeDiary)
                 .Include(u=>u.Company).ThenInclude(c=>c.Positions)
                 .Include(u=>u.Dean)
                 .Where(x => x.Id == id).FirstOrDefaultAsync();
@@ -92,6 +94,7 @@ namespace Dev_proc.Controllers
             return View(model);
         }
 
+        [Route("upload_resume")]
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> UploadResumeForStudentPost(ResumeFileViewModel model)
@@ -162,6 +165,92 @@ namespace Dev_proc.Controllers
             string file_path = Path.Combine(_appEnvironment.ContentRootPath, file_path_after_regex);
 
             return PhysicalFile(file_path, "application/pdf", user.Resume.Name);
+        }
+
+        [Route("upload_practice_diary/{userId:guid}")]
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> UploadPracticeDiaryForStudent(Guid userId)
+        {
+            var user = await _context.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var model = new ResumeFileViewModel { StudentId = userId };
+            return View(model);
+        }
+
+        [Route("upload_practice_diary")]
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> UploadPracticeDiaryForStudentPost(ResumeFileViewModel model)
+        {
+            try
+            {
+                await _fileService.UploadPracticeDiary(model);
+            }
+            catch (ArgumentNullException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            TempData["Success"] = "Practice diary uploaded";
+            return RedirectToAction("Profile", new { id = model.StudentId });
+        }
+        [Route("delete_practice_diary/{userId:guid}")]
+        [Authorize]
+        public async Task<IActionResult> DeletePracticeDiaryForStudent(Guid userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.PracticeDiary)
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return NotFound();
+            }
+            try
+            {
+                await _fileService.DeletePracticeDiary(user.PracticeDiary);
+            }
+            catch (ArgumentNullException)
+            {
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            TempData["Success"] = "Practice diary deleted";
+            return RedirectToAction("Profile", new { id = userId });
+        }
+        [Route("download_practice_diary/{userId:guid}")]
+        [Authorize]
+        public async Task<IActionResult> DownloadPracticeDiary(Guid userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.PracticeDiary)
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return NotFound();
+            }
+            if (user.PracticeDiary == null)
+            {
+                TempData["Error"] = "Practice diary not found";
+                return RedirectToAction("Profile", new { id = userId });
+            }
+
+            string file_path_after_regex = user.PracticeDiary.Path.Remove(0, 2);
+            //string file_path_after_regex = Regex.Replace(file_path_after_regex, "/", "\\");
+            string file_path = Path.Combine(_appEnvironment.ContentRootPath, file_path_after_regex);
+
+            return PhysicalFile(file_path, "application/pdf", user.PracticeDiary.Name);
         }
     }
 }
