@@ -19,15 +19,22 @@
 		}
 		return position.Applications.Any(x => x.UserId == Guid.Parse(userId));
 	}
+	public string idForCollapse(ref int counter)
+	{
+		string id = $"collapseId{counter}";
+		counter++;
+		return id;
+	}
 }
 
 <div class="text-left">
 	@foreach (var company in @Model)
 	{
-		<a class="h2" data-bs-toggle="collapse" href="#@company.Id" role="button" aria-expanded="false" aria-controls="@company.Id">
+		var collapseId = $"collapseId{counter}";
+		<a class="h2" data-bs-toggle="collapse" href="#@collapseId" role="button" aria-expanded="false" aria-controls="@collapseId">
 			@company.Name
 		</a>
-		<div class="collapse" id="@company.Id">
+		<div class="collapse" id="@collapseId">
 			@foreach (var position in company.Positions)
 			{
 				<p>
@@ -53,6 +60,7 @@
 			}
 		</div>
 		<hr>
+		counter++;
 	}
 </div>
 

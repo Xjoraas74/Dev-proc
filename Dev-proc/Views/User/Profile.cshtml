@@ -33,15 +33,11 @@
 			</p>
 		}
 	}
-	else if(@Model.Dean != null)
+	else if (@Model.Dean != null)
 	{
 		<p class="h3">Dean: @Model.Dean.Name</p>
-		<p>
-			<a href='@Url.Action("CreateCompany","Dean")' class="btn btn-primary">Create company</a>
-			<a href='@Url.Action("CreateStudent","Dean")' class="btn btn-info">Create student profile</a>
-		</p>
 	}
-	else 
+	else
 	{
 		<p class="h3">@Model.Email</p>
 		<p class="h4">@Model.Surname</p>
@@ -62,4 +58,16 @@
 		}
 
 	}
+	@if (User.IsInRole(ApplicationRoleNames.Dean) || User.IsInRole(ApplicationRoleNames.Administrator))
+	{
+		<p>
+			@if (User.IsInRole(ApplicationRoleNames.Administrator))
+			{
+				<a href='@Url.Action("CreateDean","Dean")' class="btn btn-warning">Create dean profile</a>
+			}
+			<a href='@Url.Action("CreateCompany","Dean")' class="btn btn-primary">Create company</a>
+			<a href='@Url.Action("CreateStudent","Dean")' class="btn btn-info">Create student profile</a>
+		</p>
+	}
+
 </div>
