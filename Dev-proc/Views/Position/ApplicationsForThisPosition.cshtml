@@ -1,7 +1,29 @@
-﻿@using Dev_proc.Models.ViewModels.PositionViews
+﻿@using Dev_proc.Models.Enums
+@using Dev_proc.Models.ViewModels.PositionViews
 @model Dev_proc.Models.ViewModels.PositionViews.PositionAndCompanyViewModel
 @{
 	ViewData["Title"] = "Companies Page";
+}
+@functions{
+	public string candidatureStatus(CandidateStatus status)
+	{
+		switch (status)
+		{
+			case CandidateStatus.New:
+				return "btn-primary";
+			case CandidateStatus.InProcess:
+				return "btn-warning";
+			case CandidateStatus.Accepted:
+				return "btn-success";
+			case CandidateStatus.Denied:
+				return "btn-danger";
+			case CandidateStatus.Undefiend:
+				return "btn-dark";
+			default:
+				return "btn-info";
+		}
+
+	}	
 }
 
 <div class="text-left">
@@ -11,14 +33,14 @@
 	@foreach (var position in @Model.positions)
 	{
 		<div class="card mb-3">
-			<div class="card-header">@position.Name  @position.AvailablePlaces</div>
+			<div class="card-header">Position name: @position.Name  @position.AvailablePlaces</div>
 			<div class="card-body">
-				<div class="card-text">@position.Description</div>
-
+				<div class="card-text">Description: @position.Description</div>
+				<p class="h4">Candidates:</p>
 				@foreach (var application in position.Applications)
 				{
 					<div class="card-body">
-						<a href='@Url.Action("EditPosition","Position",new {positionId = position.Id})' class="btn btn-primary">@application.User.Email</a>
+						<a href='@Url.Action("GetCandidature","Candidacy",new {candidatureId = application.Id})' class="btn @candidatureStatus(application.Status)">@application.User.Email</a>
 					</div>
 				}				
 			</div>

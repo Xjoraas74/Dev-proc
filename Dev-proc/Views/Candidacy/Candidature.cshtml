@@ -1,0 +1,31 @@
+﻿@using Dev_proc.Models.Enums
+@using Dev_proc.Models.ViewModels.CandidacyViews
+@using Dev_proc.Models.ViewModels.PositionViews
+@model CandidacyViewModel
+@{
+	ViewData["Title"] = "Companies Page";
+}
+
+<form asp-action="CheckCandidature" asp-controller="Candidacy" method="post" enctype="multipart/form-data">
+	<input type="hidden" asp-for="CandidatureId" value="@Model.CandidatureId" id="uploadCompanyId" />
+	<p class="h4">Position: @Model.PositionName</p>
+	<p class="h4">User Email: @Model.Email</p>
+	@if (@Model.Resume != null)
+	{
+		<p class="h4">User resume: @Model.Resume.Name</p>
+		<a href='@Url.Action("DownloadResume","User", new {userId = @Model.UserId})'>Download Resume</a>
+	}
+	else
+	{
+		<p class="h4">User deleted his resume</p>
+	}
+	<p>
+		<select asp-for="CandidateStatus" asp-items="Html.GetEnumSelectList<CandidateStatus>()" class="form-control"></select>
+	</p>
+	<p>
+		<textarea asp-for="Comment" type="text" placeholder="Comment" value="@Model.Comment" class="form-control" rows="3"></textarea>
+	</p>
+	<p>
+		<input type="submit" value="Edit" />
+	</p>
+</form>

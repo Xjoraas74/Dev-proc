@@ -137,13 +137,31 @@ namespace Dev_proc.Controllers
                 .Where(x => x.Id == positionId).FirstOrDefaultAsync();
             if (position == null)
             {
-                return BadRequest("Position not found");
+                return NotFound("Position not found");
             }
             List<Position> positions = new List<Position>() { position };
             return View(new PositionAndCompanyViewModel
             {
                 CompanyName = position.Company.Name,
                 positions = positions
+            });
+        }
+        [Route("{companyId:guid}/all_position_candidates")]
+        [Authorize(Roles = ApplicationRoleNames.Company)]
+        public async Task<IActionResult> ApplicationsForThisCompany(Guid companyId)
+        {
+            var company = await _context.Companies
+                .Include(x => x.Positions).ThenInclude(x => x.Applications).ThenInclude(a => a.User)
+                .Where(x => x.Id == companyId).FirstOrDefaultAsync();
+            if (company == null)
+            {
+                return NotFound("Company not found");
+            }
+
+            return View("ApplicationsForThisPosition",new PositionAndCompanyViewModel
+            {
+                CompanyName = company.Name,
+                positions = company.Positions.ToList()
             });
         }
     }

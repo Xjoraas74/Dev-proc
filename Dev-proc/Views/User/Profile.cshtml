@@ -10,11 +10,13 @@
 	@if (@Model.Company != null)
 	{
 		<p class="h3">@Model.Company.Name</p>
-		<a href='@Url.Action("AddPositionToCompany","Company", new {companyId = @Model.Company.Id})'>Create position</a>
-		@*TODO: add button to edit *@
-		if(@Model.Company.Positions.Count()>0){
-			<a href='@Url.Action("ApplicationsForThisPosition","Position")' class="btn btn-secondary">All candidates</a>
-		}
+		<p>
+			<a href='@Url.Action("AddPositionToCompany","Company", new {companyId = @Model.Company.Id})' class="btn btn-primary">Create position</a>
+			@*TODO: add button to edit *@
+			@if(@Model.Company.Positions.Count()>0){
+			<a href='@Url.Action("ApplicationsForThisCompany","Position", new {companyId = @Model.Company.Id})' class="btn btn-secondary">All candidates</a>
+			}
+		</p>
 		@foreach (var position in @Model.Company.Positions)
 		{
 			<div class="card mb-3">
@@ -25,8 +27,8 @@
 						<a href='@Url.Action("EditPosition","Position",new {positionId = position.Id})' class="btn btn-primary">Edit</a>
 						<a href='@Url.Action("DeletePosition","Position",new {positionId = position.Id})' class="btn btn-danger">Delete</a>
 						<a href='@Url.Action("ApplicationsForThisPosition","Position",new {positionId = position.Id})' class="btn btn-secondary">Candidates</a>
-					</div>	
-				</div>				
+					</div>
+				</div>
 			</div>
 		}
 
@@ -45,6 +47,7 @@
 		{
 			<p class="h4">Your resume: @Model.Resume.Name</p>
 			<a href='@Url.Action("DeleteResumeForStudent", new {userId = @Model.Id})'>Delete Resume</a>
+			<a href='@Url.Action("DownloadResume", new {userId = @Model.Id})'>Download Resume</a>
 		}
 	}
 </div>

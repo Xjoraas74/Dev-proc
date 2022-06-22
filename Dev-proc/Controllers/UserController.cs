@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace Dev_proc.Controllers
 {
@@ -19,16 +20,19 @@ namespace Dev_proc.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly ApplicationDbContext _context;
         private readonly IFileService _fileService;
+        private readonly IWebHostEnvironment _appEnvironment;
 
         public UserController(UserManager<User> userManager,
             SignInManager<User> signInManager,
             ApplicationDbContext context,
-            IFileService fileService)
+            IFileService fileService,
+             IWebHostEnvironment appEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
             _fileService = fileService;
+            _appEnvironment = appEnvironment;
         }
 
         [Route("")]
@@ -132,6 +136,30 @@ namespace Dev_proc.Controllers
             }
             TempData["Success"] = "Resume deleted";
             return RedirectToAction("Profile", new { id = userId });
+        }
+        [Route("download_resume/{userId:guid}")]
+        [Authorize]
+        public async Task<IActionResult> DownloadResume(Guid userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Resume)
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return NotFound();
+            }
+            if (user.Resume == null)
+            {
+                TempData["Error"] = "Resume not found";
+                return RedirectToAction("Profile", new { id = userId });
+            }
+
+            string file_path_after_regex = user.Resume.Path.Remove(0, 2);
+            //string file_path_after_regex = Regex.Replace(file_path_after_regex, "/", "\\");
+            string file_path = Path.Combine(_appEnvironment.ContentRootPath, file_path_after_regex);
+
+            return PhysicalFile(file_path, "application/pdf", user.Resume.Name);
         }
     }
 }

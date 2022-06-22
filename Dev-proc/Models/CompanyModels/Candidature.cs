@@ -9,7 +9,9 @@ namespace Dev_proc.Models.CompanyModels
         public User User { get; set; }
         public Guid UserId { get; set; }
         public Position Position { get; set; }
+        public string? Comment { get; set; }
         public Guid PositionId { get; set; }
         public CandidateStatus Status { get; set; } = CandidateStatus.New;
+        public DateTime? InterviewDate { get; set; }
     }
 }
