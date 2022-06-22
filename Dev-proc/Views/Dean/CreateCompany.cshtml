@@ -1,0 +1,20 @@
+﻿@using Dev_proc.Models.ViewModels.DeanViews
+@model CreateCompanyViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<form asp-action="CreateCompanyPost" asp-controller="Dean" method="post" enctype="multipart/form-data">
+    <p>
+        <input name="Name" type="text" placeholder = "Company name" class="form-control" />
+    </p>
+    <p>
+        <input name="Email" type="text" placeholder = "Company email" class="form-control" />
+    </p>
+    <p>
+        <input name="Password" type="password" placeholder = "Company password" class="form-control" />
+    </p>
+    <p>
+        <input type="submit" value="Добавить" />
+    </p>
+</form>

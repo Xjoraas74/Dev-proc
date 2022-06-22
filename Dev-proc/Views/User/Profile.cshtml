@@ -13,7 +13,6 @@
 		<p class="h3">@Model.Company.Name</p>
 		<p>
 			<a href='@Url.Action("AddPositionToCompany","Company", new {companyId = @Model.Company.Id})' class="btn btn-primary">Create position</a>
-			@*TODO: add button to edit *@
 			@if (@Model.Company.Positions.Count() > 0)
 			{
 				<a href='@Url.Action("ApplicationsForThisCompany","Position", new {companyId = @Model.Company.Id})' class="btn btn-secondary">All candidates</a>
@@ -34,7 +33,15 @@
 			</p>
 		}
 	}
-	else
+	else if(@Model.Dean != null)
+	{
+		<p class="h3">Dean: @Model.Dean.Name</p>
+		<p>
+			<a href='@Url.Action("CreateCompany","Dean")' class="btn btn-primary">Create company</a>
+			<a href='@Url.Action("CreateStudent","Dean")' class="btn btn-info">Create student profile</a>
+		</p>
+	}
+	else 
 	{
 		<p class="h3">@Model.Email</p>
 		<p class="h4">@Model.Surname</p>

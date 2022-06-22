@@ -1,5 +1,6 @@
 using Dev_proc.Data;
 using Dev_proc.Models.CompanyModels;
+using Dev_proc.Models.DeanModels;
 using Dev_proc.Models.Identity;
 using Dev_proc.Services;
 using Microsoft.AspNetCore.Identity;
@@ -109,6 +110,26 @@ foreach (var roleType in Enum.GetValues<RoleType>())
             };
             user.Company = company;
             context.Companies.Add(company);
+        }
+        if (roleType == RoleType.Company)
+        {
+            var company = new Company
+            {
+                User = user,
+                Name = "ÓÖÐ)"
+            };
+            user.Company = company;
+            context.Companies.Add(company);
+        }
+        if(roleType == RoleType.Dean)
+        {
+            var dean = new Dean
+            {
+                User = user,
+                Name = "ÒÃÓ"
+            };
+            user.Dean = dean;
+            context.Deans.Add(dean);
         }
         user.Roles = new List<UserRole>() { userRole };
         await userManager.CreateAsync(user, systemUserPassword);

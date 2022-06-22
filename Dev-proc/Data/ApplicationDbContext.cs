@@ -1,5 +1,6 @@
 ﻿using Dev_proc.Models.CompanyModels;
 using Dev_proc.Models.Data;
+using Dev_proc.Models.DeanModels;
 using Dev_proc.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -22,6 +23,7 @@ namespace Dev_proc.Data
         public DbSet<Company> Companies { get; set; }   
         public DbSet<Position> Positions { get; set; }
         public DbSet<Candidature> Candidatures { get; set; }
+        public DbSet<Dean> Deans { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

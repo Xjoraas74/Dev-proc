@@ -51,6 +51,7 @@ namespace Dev_proc.Controllers
             User? currentUser = await _userManager.Users
                 .Include(u => u.Resume)
                 .Include(u => u.Company).ThenInclude(c => c.Positions)
+                .Include(u => u.Dean)
                 .Where(u => u.Id == Guid.Parse(userId))
                 .FirstOrDefaultAsync();
 
@@ -69,6 +70,7 @@ namespace Dev_proc.Controllers
             var user = await _context.Users
                 .Include(u => u.Resume)
                 .Include(u=>u.Company).ThenInclude(c=>c.Positions)
+                .Include(u=>u.Dean)
                 .Where(x => x.Id == id).FirstOrDefaultAsync();
             if (user == null)
             {

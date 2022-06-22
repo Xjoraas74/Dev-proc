@@ -1,0 +1,26 @@
+﻿@using Dev_proc.Models.ViewModels.DeanViews
+@model CreateStudentViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<form asp-action="CreateStudentPost" asp-controller="Dean" method="post" enctype="multipart/form-data">
+    <p>
+        <input name="Surname" type="text" placeholder = "Student surname" class="form-control" />
+    </p>
+    <p>
+        <input name="Firstname" type="text" placeholder = "Student firstname" class="form-control" />
+    </p>
+    <p>
+        <input name="Secondname" type="text" placeholder = "Student secondname" class="form-control" />
+    </p>
+    <p>
+        <input name="Email" type="text" placeholder = "Student email" class="form-control" />
+    </p>
+    <p>
+        <input name="Password" type="password" placeholder = "Student password" class="form-control" />
+    </p>
+    <p>
+        <input type="submit" value="Добавить" />
+    </p>
+</form>
