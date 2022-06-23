@@ -150,6 +150,7 @@ namespace Dev_proc.Controllers
             var students = await _context.Users
                 .Include(u => u.Roles).ThenInclude(r => r.Role)
                 .Include(u => u.PracticeDiary)
+                .Include(u=>u.Company)
                 .Where(u => u.Roles.Any(x => x.Role.Name == ApplicationRoleNames.Student))
                 .ToListAsync();
             return View(students);
@@ -305,6 +306,82 @@ namespace Dev_proc.Controllers
 			await _context.SaveChangesAsync();
 			TempData["Success"] = "Student accounts successfully created";
             return RedirectToAction("Index", "User");
+        }
+        [Route("{userId:guid}/add_student_to_company")]
+        [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
+        [HttpGet]
+        public async Task<IActionResult> AddStudentToCompanyIntern(Guid userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Company)
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+
+            if(user == null)
+			{
+                return NotFound("User not found");
+			}
+
+            return View(new AddStudentToCompanyInternViewModel 
+            { 
+                UserId = userId,
+                Companies = await _context.Companies.ToListAsync(),
+                Firstname = user.Firstname,
+                Surname = user.Surname,
+                Secondname = user.Secondname
+            });
+        }
+
+        [Route("add_student_to_company")]
+        [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
+        [HttpPost]
+        public async Task<IActionResult> AddStudentToCompanyInternPost(AddStudentToCompanyInternViewModel model)
+        {
+            if(model.CompanyId == null || (Guid.Empty == model.CompanyId))
+			{
+                TempData["Error"] = "Please select company";
+                return RedirectToAction("AddStudentToCompanyIntern", "Dean", new { userId = model.UserId });
+			}
+            var user = await _context.Users
+                .Include(u => u.Company)
+                .Where(u => u.Id == model.UserId)
+                .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            var company = await _context.Companies.Where(c => c.Id == model.CompanyId)
+                .FirstOrDefaultAsync();
+            if (company == null)
+			{
+                return NotFound("Company not found");
+            }
+            user.Company = company;
+            _context.Update(user);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Company intern added to student";
+            return RedirectToAction("StudentsList", "Dean");
+        }
+        [Route("{userId:guid}/delete_student_from_company")]
+        [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
+        [HttpGet]
+        public async Task<IActionResult> DeleteStudentFromCompanyIntern(Guid userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Company)
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            user.Company = null;
+            _context.Update(user);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Student deleted from company";
+            return RedirectToAction("StudentsList", "Dean");
         }
     }
 }

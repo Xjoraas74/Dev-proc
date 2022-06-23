@@ -50,6 +50,19 @@
 						Practice diary not submitted
 					</div>
 				}
+				@if (user.Company != null)
+				{
+					<div class="card-body">
+						Company Intern: @user.Company.Name <a href='@Url.Action("DeleteStudentFromCompanyIntern","Dean", new {userId = user.Id})' class="btn btn-danger">Delete company intern</a>
+					</div>
+				}
+				else
+				{
+					<div class="card-body">
+						Company Intern: <a href='@Url.Action("AddStudentToCompanyIntern","Dean", new {userId = user.Id})' class="btn btn-light">Add company Intern</a>
+					</div>
+				}
+
 			</div>
 		</p>
 

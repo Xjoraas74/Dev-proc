@@ -1,0 +1,25 @@
+﻿@using Dev_proc.Models.Enums
+@using Dev_proc.Models.ViewModels.DeanViews
+@using Dev_proc.Models.ViewModels.PositionViews
+@model AddStudentToCompanyInternViewModel
+@{
+	ViewData["Title"] = "Companies Page";
+}
+
+<form asp-action="AddStudentToCompanyInternPost" asp-controller="Dean" method="post" enctype="multipart/form-data">
+	<input type="hidden" asp-for="UserId" value="@Model.UserId" id="uploadCompanyId" />
+	<p class="h4">Student name: @Model.Surname @Model.Firstname @Model.Secondname</p>
+	<p>
+		@*@Html.DropDownListFor(m=>m.Company, @Model.Companies, "Select company")*@
+		<select id="companyId" class="form-control bg-secondary text-light" asp-for="@Model.CompanyId">
+			<option value=@null selected="selected" disabled>Select company</option>
+        @foreach (var company in Model.Companies)
+        {
+            <option value="@company.Id">@company.Name</option>
+        }
+    </select>
+	</p>
+	<p>
+		<input type="submit" value="Save" />
+	</p>
+</form>

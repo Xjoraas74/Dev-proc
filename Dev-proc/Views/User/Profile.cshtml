@@ -8,7 +8,7 @@
 }
 
 <div class="text-left">
-	@if (@Model.Company != null)
+	@if (@Model.Company != null && User.IsInRole(ApplicationRoleNames.Company))
 	{
 		<p class="h3">@Model.Company.Name</p>
 		<p>
@@ -45,6 +45,11 @@
 				<p class="h4">@Model.Surname</p>
 				<p class="h4">@Model.Firstname</p>
 				<p class="h4">@Model.Secondname</p>
+				@if(@Model.Company != null)
+				{
+					<p class="h4">Company intern: @Model.Company.Name</p>
+				}
+				
 			</div>
 		</div>
 		@if (Model.Resume == null)
@@ -55,7 +60,7 @@
 				</div>
 			</div>
 		}
-		else
+		else if(User.IsInRole(ApplicationRoleNames.Student))
 		{
 			<div class="card">
 				<div class="card-body">
