@@ -41,7 +41,7 @@ namespace Dev_proc.Controllers
                 UserName = model.Email,
                 EmailConfirmed = true,
             };
-            
+
             Company company = new Company
             {
                 Name = model.Name,
@@ -59,7 +59,7 @@ namespace Dev_proc.Controllers
             }
             await _context.SaveChangesAsync();
             TempData["Success"] = "Company profile created";
-            return RedirectToAction("Index","User");
+            return RedirectToAction("Index", "User");
         }
 
         [Route("create_student")]
@@ -136,6 +136,24 @@ namespace Dev_proc.Controllers
             await _context.SaveChangesAsync();
             TempData["Success"] = "Dean profile created";
             return RedirectToAction("Index", "User");
+        }
+        [Route("student_list")]
+        [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
+        public async Task<IActionResult> StudentsList()
+        {
+            //var StudentRoleId = Guid.Parse("ed8b495e-e14e-4299-15b7-08da43ef8189");
+            //var students = await _context.UserRoles
+            //    .Include(u => u.User).ThenInclude(u=>u.PracticeDiary)
+            //    .Include(u => u.Role)
+            //    .Where(u => u.RoleId == StudentRoleId)
+            //    .ToListAsync();
+            var students = await _context.Users
+                .Include(u=>u.Roles).ThenInclude(r=>r.Role)
+                .Include(u=>u.PracticeDiary)
+                .Where(u=>u.Roles.Any(x=>x.Role.Name== ApplicationRoleNames.Student))
+                .ToListAsync();
+            return View(students);
+
         }
     }
 }

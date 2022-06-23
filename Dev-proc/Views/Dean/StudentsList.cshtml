@@ -1,0 +1,87 @@
+﻿@using Dev_proc.Constants
+@using Dev_proc.Constants.Configuration
+@using Dev_proc.Models.CompanyModels
+@using Dev_proc.Models.Enums
+@using Dev_proc.Models.Identity
+@using Microsoft.AspNetCore.Identity
+@model List<User>
+@{
+}
+@functions {
+	@functions {
+		public string practiceDiaryStatus(PracticeDiaryStatus status)
+		{
+			switch (status)
+			{
+				case PracticeDiaryStatus.New:
+					return "btn-primary";
+				case PracticeDiaryStatus.NeedFixes:
+					return "btn-warning";
+				case PracticeDiaryStatus.Accepted:
+					return "btn-success";
+				default:
+					return "btn-info";
+			}
+
+		}
+	}
+}
+
+<div class="text-left">
+	@foreach (var user in @Model)
+	{
+
+		<p>
+			<div class="card mb-3">
+				<div class="card-header">@user.Surname @user.Firstname @user.Secondname</div>
+				@if (user.PracticeDiary != null)
+				{
+					<div class="card-body">
+						Practice Diary status: <a href='@Url.Action("CheckYourCandidacy","Candidacy")' class="btn @practiceDiaryStatus(@user.PracticeDiary.PracticeDiaryStatus)">Practice diary</a>
+					</div>
+				}
+				else
+				{
+					<div class="card-body">
+						Practice diary not submitted
+					</div>
+				}
+			</div>
+		</p>
+
+
+
+		@*var collapseId = $"collapseId{counter}";
+			<a class="h2" data-bs-toggle="collapse" href="#@collapseId" role="button" aria-expanded="false" aria-controls="@collapseId">
+			@company.Name
+			</a>
+			<div class="collapse" id="@collapseId">
+			@foreach (var position in company.Positions)
+			{
+			<p>
+			<div class="card mb-3">
+			<div class="card-header">@position.Name @CshtmlHelper.AvailablePlacesToName(@position.AvailablePlaces)</div>
+			<div class="card-body">
+			<div class="card-text">@position.Description</div>
+			</div>
+			</div>
+			@if (User.IsInRole(ApplicationRoleNames.Student))
+			{
+
+			@if (checkResumeIsSubmitted(position))
+			{
+			<a href='@Url.Action("CheckYourCandidacy","Candidacy", new {userId = @userId, positionId = position.Id})' class="btn btn-secondary">Check your candidacy</a>
+			}
+			else
+			{
+			<a href='@Url.Action("SubmitResumeForPosition","Position", new {positionId = position.Id})' class="btn btn-primary">Submit your CV</a>
+			}
+			}
+			</p>
+			}
+			</div>
+			<hr>
+			counter++;*@
+	}
+</div>
+

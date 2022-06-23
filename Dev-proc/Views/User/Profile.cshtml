@@ -97,8 +97,10 @@
 			@if (User.IsInRole(ApplicationRoleNames.Administrator))
 			{
 				<a href='@Url.Action("CreateDean","Dean")' class="btn btn-warning">Create dean profile</a>
+				
 			}
-			<a href='@Url.Action("CreateCompany","Dean")' class="btn btn-primary">Create company</a>
+			<a href='@Url.Action("StudentsList","Dean")' class="btn btn-primary">Students list</a>
+			<a href='@Url.Action("CreateCompany","Dean")' class="btn btn-info">Create company</a>
 			<a href='@Url.Action("CreateStudent","Dean")' class="btn btn-info">Create student profile</a>
 		</p>
 	}
