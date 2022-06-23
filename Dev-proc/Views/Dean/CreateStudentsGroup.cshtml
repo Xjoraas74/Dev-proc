@@ -1,0 +1,17 @@
+﻿@using Dev_proc.Models.ViewModels.DeanViews
+@model CreateStudentsGroupViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<form asp-action="CreateAccountsForGroupStudents" asp-controller="Dean" method="post" enctype="multipart/form-data">
+    <p>
+        <input asp-for="GroupNumber" type="text" placeholder = "Group number" class="form-control" />
+    </p>
+    <p>
+        <input asp-for="Password" type="password" placeholder = "Password for students" class="form-control" />
+    </p>
+    <p>
+        <input type="submit" value="Добавить" />
+    </p>
+</form>

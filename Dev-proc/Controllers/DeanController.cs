@@ -1,5 +1,6 @@
 ﻿using Dev_proc.Constants.Configuration;
 using Dev_proc.Data;
+using Dev_proc.Models;
 using Dev_proc.Models.CompanyModels;
 using Dev_proc.Models.DeanModels;
 using Dev_proc.Models.Identity;
@@ -8,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace Dev_proc.Controllers
 {
@@ -16,11 +19,14 @@ namespace Dev_proc.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
         public DeanController(UserManager<User> userManager,
-            ApplicationDbContext context)
+            ApplicationDbContext context,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _context = context;
+            _configuration = configuration;
         }
         [Route("create_company")]
         [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
@@ -208,7 +214,7 @@ namespace Dev_proc.Controllers
         {
             var user = await _context.Users
                 .Include(c => c.PracticeDiary)
-                .Where(u=>u.Id == userId)
+                .Where(u => u.Id == userId)
                 .FirstOrDefaultAsync();
             if (user == null)
             {
@@ -228,6 +234,73 @@ namespace Dev_proc.Controllers
                 PracticeDiary = user.PracticeDiary,
                 PracticeDiaryStatus = user.PracticeDiary.PracticeDiaryStatus
             });
+        }
+        [Route("create_group_of_students")]
+        [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
+        [HttpGet]
+        public async Task<IActionResult> CreateStudentsGroup()
+        {
+            return View(new CreateStudentsGroupViewModel { });
+        }
+
+        [Route("create_group_of_students")]
+        [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
+        [HttpPost]
+        public async Task<IActionResult> CreateAccountsForGroupStudents(CreateStudentsGroupViewModel model)
+        {
+            HttpClient client = new HttpClient();
+            var lk = _configuration.GetSection("LKStudent");
+            string lk_username = lk.GetSection("Loggin").Value;
+            string lk_password = lk.GetSection("Password").Value;
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Add("Host", "api.lk.student.tsu.ru");
+            string basicAuth = System.Convert.ToBase64String(Encoding.GetEncoding("ISO-8859-1")
+                                           .GetBytes(lk_username + ":" + lk_password));
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Basic", basicAuth);
+            var uri = "https://api.lk.student.tsu.ru/" + "students/group/" + model.GroupNumber;
+            var response = await client.GetAsync(uri);
+            if (!response.IsSuccessStatusCode)
+            {
+                return BadRequest();
+            }
+            var students = await response.Content.ReadFromJsonAsync<List<TSUStudent>>();
+            if (students == null || students.Count == 0)
+            {
+                return NotFound("Students not found");
+            }
+            Role role = await _context.Roles
+                .Where(r => r.Name == ApplicationRoleNames.Student).FirstAsync();
+            var localUsers = await _context.Users.ToListAsync();
+
+            foreach (var student in students)
+			{
+                var localUser = localUsers.Where(u => u.Email == student.Email).FirstOrDefault();
+                if(localUser != null)
+				{
+                    continue;
+				}
+				var user = new User
+				{
+					Email = student.Email,
+					UserName = student.Email,
+					Surname = student.LastName,
+					Secondname = student.Patronymic,
+					Firstname = student.FirstName,
+					EmailConfirmed = true,
+				};
+                user.Roles = new List<UserRole>() { new UserRole { Role = role, User = user } };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (!result.Succeeded)
+                {
+                    continue;
+                }
+            }
+			await _context.SaveChangesAsync();
+			TempData["Success"] = "Student accounts successfully created";
+            return RedirectToAction("Index", "User");
         }
     }
 }
