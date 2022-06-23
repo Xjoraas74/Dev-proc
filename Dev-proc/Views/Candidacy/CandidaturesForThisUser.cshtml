@@ -30,6 +30,12 @@
 }
 
 <div class="text-left">
+	@if(@Model.Candidatures?.Count == 0)
+	{
+		<p><h2>Your candidatures list is empty</h2></p>	
+		<p><a href='@Url.Action("CompaniesList","Company")' class="btn btn-primary">Companies</a></p>
+
+	}
 	@foreach (var candidature in @Model.Candidatures)
 	{
 		<p>

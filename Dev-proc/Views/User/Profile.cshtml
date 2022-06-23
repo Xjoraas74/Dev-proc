@@ -96,16 +96,18 @@
 	@if (User.IsInRole(ApplicationRoleNames.Dean) || User.IsInRole(ApplicationRoleNames.Administrator))
 	{
 		<p>
+			<a href='@Url.Action("StudentsList","Dean")' class="btn btn-primary">Students list</a>
+			<p>
+				<h4>Create accounts:</h4>
 			@if (User.IsInRole(ApplicationRoleNames.Administrator))
 			{
 				<a href='@Url.Action("CreateDean","Dean")' class="btn btn-warning">Create dean profile</a>
 				
 			}
-			<a href='@Url.Action("StudentsList","Dean")' class="btn btn-primary">Students list</a>
 			<a href='@Url.Action("CreateCompany","Dean")' class="btn btn-info">Create company account</a>
 			<a href='@Url.Action("CreateStudent","Dean")' class="btn btn-info">Create student account</a>
 			<a href='@Url.Action("CreateStudentsGroup","Dean")' class="btn btn-info">Create accounts for group</a>
-			
+			</p>
 		</p>
 	}
 
