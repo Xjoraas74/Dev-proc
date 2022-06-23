@@ -1,0 +1,32 @@
+﻿@using Dev_proc.Models.Enums
+@using Dev_proc.Models.ViewModels.DeanViews
+@using Dev_proc.Models.ViewModels.PositionViews
+@model PracticeDiaryViewModel
+@{
+	ViewData["Title"] = "Companies Page";
+}
+
+<form asp-action="CheckUserPracticeDiary" asp-controller="Dean" method="post" enctype="multipart/form-data">
+	<input type="hidden" asp-for="UserId" value="@Model.UserId" id="uploadCompanyId" />
+	<p class="h4">Student name: @Model.Surname @Model.Firstname @Model.Secondname</p>
+	@if (@Model.PracticeDiary != null)
+	{
+		<p class="h4">
+			User resume: @Model.PracticeDiary.Name
+			<a href='@Url.Action("DownloadPracticeDiary","User", new {userId = @Model.UserId})' class="btn btn-info">Download practice diary</a>
+		</p>
+	}
+	else
+	{
+		<p class="h4">Student deleted his pracitce diary</p>
+	}
+	<p>
+		<select asp-for="PracticeDiaryStatus" asp-items="Html.GetEnumSelectList<PracticeDiaryStatus>()" class="form-control"></select>
+	</p>
+	<p>
+		<textarea asp-for="Comment" type="text" placeholder="Comment" value="@Model.Comment" class="form-control" rows="3"></textarea>
+	</p>
+	<p>
+		<input type="submit" value="Save" />
+	</p>
+</form>

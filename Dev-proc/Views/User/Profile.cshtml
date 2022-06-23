@@ -59,7 +59,8 @@
 		{
 			<div class="card">
 				<div class="card-body">
-					<p class="h4">Your resume: @Model.Resume.Name</p>
+					<p class="h4">Resume</p>
+					<p>@Model.Resume.Name</p>
 					<p>
 						<a href='@Url.Action("DeleteResumeForStudent", new {userId = @Model.Id})' class="btn btn-danger">Delete Resume</a>
 						<a href='@Url.Action("DownloadResume", new {userId = @Model.Id})' class="btn btn-info">Download Resume</a>
@@ -80,11 +81,12 @@
 		{
 			<div class="card">
 				<div class="card-body">
-					<p class="h4">Your practice diary: @Model.PracticeDiary.Name</p>
+					<p class="h4">Practice diary</p>
+					<p>@Model.PracticeDiary.Name</p>
 					<p>
 						<a href='@Url.Action("DeletePracticeDiaryForStudent", new {userId = @Model.Id})' class="btn btn-danger">Delete practice diary</a>
 						<a href='@Url.Action("DownloadPracticeDiary", new {userId = @Model.Id})' class="btn btn-info">Download practice diary</a>
-						@*<a href='@Url.Action("CandidaturesForThisUser","Candidacy", new {userId = @Model.Id})' class="btn btn-primary">All your candidatures</a>*@
+						<a href='@Url.Action("StudentCheckPracticeDiary","Dean", new {userId = @Model.Id})' class="btn btn-primary">Check practice diary status</a>
 					</p>
 				</div>
 			</div>

@@ -28,6 +28,9 @@
 }
 
 <div class="text-left">
+	<p>
+		<a href='@Url.Action("CreateStudent","Dean")' class="btn btn-info">Create student profile</a>
+	</p>
 	@foreach (var user in @Model)
 	{
 
@@ -37,7 +40,7 @@
 				@if (user.PracticeDiary != null)
 				{
 					<div class="card-body">
-						Practice Diary status: <a href='@Url.Action("CheckYourCandidacy","Candidacy")' class="btn @practiceDiaryStatus(@user.PracticeDiary.PracticeDiaryStatus)">Practice diary</a>
+						Practice Diary status: <a href='@Url.Action("UserPracticeDiary","Dean", new {userId = user.Id})' class="btn @practiceDiaryStatus(@user.PracticeDiary.PracticeDiaryStatus)">Practice diary</a>
 					</div>
 				}
 				else

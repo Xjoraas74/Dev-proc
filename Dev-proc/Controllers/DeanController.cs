@@ -141,19 +141,93 @@ namespace Dev_proc.Controllers
         [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
         public async Task<IActionResult> StudentsList()
         {
-            //var StudentRoleId = Guid.Parse("ed8b495e-e14e-4299-15b7-08da43ef8189");
-            //var students = await _context.UserRoles
-            //    .Include(u => u.User).ThenInclude(u=>u.PracticeDiary)
-            //    .Include(u => u.Role)
-            //    .Where(u => u.RoleId == StudentRoleId)
-            //    .ToListAsync();
             var students = await _context.Users
-                .Include(u=>u.Roles).ThenInclude(r=>r.Role)
-                .Include(u=>u.PracticeDiary)
-                .Where(u=>u.Roles.Any(x=>x.Role.Name== ApplicationRoleNames.Student))
+                .Include(u => u.Roles).ThenInclude(r => r.Role)
+                .Include(u => u.PracticeDiary)
+                .Where(u => u.Roles.Any(x => x.Role.Name == ApplicationRoleNames.Student))
                 .ToListAsync();
             return View(students);
 
+        }
+        [Route("{userId:guid}/practice_diary")]
+        [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
+        [HttpGet]
+        public async Task<IActionResult> UserPracticeDiary(Guid userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.PracticeDiary)
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            if (user.PracticeDiary == null)
+            {
+                return NotFound("User doesn't have a practice diary");
+            }
+            return View("StudentPracticeDiary", new PracticeDiaryViewModel
+            {
+                UserId = user.Id,
+                Surname = user.Surname,
+                Firstname = user.Firstname,
+                Secondname = user.Secondname,
+                Comment = user.PracticeDiary.Comment,
+                PracticeDiary = user.PracticeDiary,
+                PracticeDiaryStatus = user.PracticeDiary.PracticeDiaryStatus
+            });
+        }
+        [Route("update_practice_diary")]
+        [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
+        [HttpPost]
+        public async Task<IActionResult> CheckUserPracticeDiary(PracticeDiaryViewModel model)
+        {
+            var user = await _context.Users
+               .Include(u => u.PracticeDiary)
+               .Where(u => u.Id == model.UserId)
+               .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            if (user.PracticeDiary == null)
+            {
+                return NotFound("User doesn't have a practice diary");
+            }
+            user.PracticeDiary.PracticeDiaryStatus = model.PracticeDiaryStatus;
+            user.PracticeDiary.Comment = model.Comment;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Practice diary updated";
+            return RedirectToAction("StudentsList");
+        }
+
+        [Route("{userId:guid}/your_practice_diary")]
+        [Authorize]
+        public async Task<IActionResult> StudentCheckPracticeDiary(Guid userId)
+        {
+            var user = await _context.Users
+                .Include(c => c.PracticeDiary)
+                .Where(u=>u.Id == userId)
+                .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+            if (user.PracticeDiary == null)
+            {
+                return NotFound("User doesn't have a practice diary");
+            }
+            return View("StudentCheckPracticeDiary", new PracticeDiaryViewModel
+            {
+                UserId = user.Id,
+                Surname = user.Surname,
+                Firstname = user.Firstname,
+                Secondname = user.Secondname,
+                Comment = user.PracticeDiary.Comment,
+                PracticeDiary = user.PracticeDiary,
+                PracticeDiaryStatus = user.PracticeDiary.PracticeDiaryStatus
+            });
         }
     }
 }

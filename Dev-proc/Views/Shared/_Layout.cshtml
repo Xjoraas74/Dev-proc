@@ -45,6 +45,12 @@
 								<a href='@Url.Action("CandidaturesForThisUser","Candidacy", new {userId = userId})' class="nav-link text-dark">All your candidatures</a>
 							</li>
 						}
+						@if (User.IsInRole(ApplicationRoleNames.Dean) && userId != null)
+						{
+							<li class="nav-item">
+								<a href='@Url.Action("StudentsList","Dean")' class="nav-link text-dark">Students list</a>
+							</li>
+						}
 					</ul>
 					<partial name="_LoginPartial" />
 				</div>
