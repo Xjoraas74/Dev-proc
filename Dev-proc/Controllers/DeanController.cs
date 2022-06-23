@@ -277,6 +277,10 @@ namespace Dev_proc.Controllers
 
             foreach (var student in students)
 			{
+                if(student.Status == 2)//отчислен
+				{
+                    continue;
+				}
                 var localUser = localUsers.Where(u => u.Email == student.Email).FirstOrDefault();
                 if(localUser != null)
 				{

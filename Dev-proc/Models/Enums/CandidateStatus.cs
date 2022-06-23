@@ -4,8 +4,9 @@
     {
         Undefiend = 0,
         New = 1,
-        InProcess =2,//также можно указывать если во второй волне
-        Accepted = 3,
-        Denied = 4
+        InProcess =2,
+        Offer = 3,
+        Accepted = 4,
+        Denied = 5
     }
 }
