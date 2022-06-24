@@ -1,4 +1,5 @@
-﻿using Dev_proc.Models.Identity;
+﻿using Dev_proc.Models.Data;
+using Dev_proc.Models.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dev_proc.Models.CompanyModels
@@ -11,6 +12,7 @@ namespace Dev_proc.Models.CompanyModels
         public User? User { get; set; }
         public string? Comment { get; set; }
         public string Name { get; set; }
+        public ICollection<StudentCompanyIntern> StudentCompanyIntern { get; set; } = new List<StudentCompanyIntern>();
         public ICollection<Position> Positions { get; set; } = new List<Position>();
     }
 }

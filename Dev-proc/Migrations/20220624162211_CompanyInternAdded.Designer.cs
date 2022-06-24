@@ -4,6 +4,7 @@ using Dev_proc.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dev_proc.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220624162211_CompanyInternAdded")]
+    partial class CompanyInternAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,7 +149,8 @@ namespace Dev_proc.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("CompanyId")
+                        .IsUnique();
 
                     b.HasIndex("StudentId")
                         .IsUnique();
@@ -477,8 +480,8 @@ namespace Dev_proc.Migrations
             modelBuilder.Entity("Dev_proc.Models.Data.StudentCompanyIntern", b =>
                 {
                     b.HasOne("Dev_proc.Models.CompanyModels.Company", "CompanyIntern")
-                        .WithMany("StudentCompanyIntern")
-                        .HasForeignKey("CompanyId")
+                        .WithOne("StudentCompanyIntern")
+                        .HasForeignKey("Dev_proc.Models.Data.StudentCompanyIntern", "CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

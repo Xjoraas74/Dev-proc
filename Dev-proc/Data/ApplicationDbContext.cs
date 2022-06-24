@@ -25,6 +25,7 @@ namespace Dev_proc.Data
         public DbSet<Position> Positions { get; set; }
         public DbSet<Candidature> Candidatures { get; set; }
         public DbSet<Dean> Deans { get; set; }
+        public DbSet<StudentCompanyIntern> StudentCompanyInterns { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -52,6 +53,16 @@ namespace Dev_proc.Data
                 .HasOne(p => p.Position)
                 .WithMany(b => b.Applications)
                 .HasForeignKey(p => p.PositionId);
+
+            modelBuilder.Entity<StudentCompanyIntern>()
+                .HasOne(s => s.Student)
+                .WithOne(c => c.StudentCompanyIntern);
+                //.HasForeignKey("");
+
+            modelBuilder.Entity<StudentCompanyIntern>()
+                .HasOne(s => s.CompanyIntern)
+                .WithMany(c => c.StudentCompanyIntern);
+                //.HasForeignKey("CompanyId");
 
         }
     }

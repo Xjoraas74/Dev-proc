@@ -21,6 +21,7 @@ namespace Dev_proc.Models.Identity
         public Company? Company { get; set; }
         public Guid? DeanId { get; set; }
         public Dean? Dean { get; set; }
+        public StudentCompanyIntern? StudentCompanyIntern { get; set; }
         [NotMapped]
         public string FullName => $"{Surname} {Firstname} {Secondname}";
     }

@@ -28,6 +28,12 @@
 }
 
 <div class="text-left">
+	<form method="get">
+		<select name="practiceDiaryStatus" asp-items="Html.GetEnumSelectList<PracticeDiaryStatus>()">
+			<option value=@null>All</option>
+		</select>
+		<input type="submit" value="Sort" />
+	</form>
 	<p>
 		<a href='@Url.Action("CreateStudent","Dean")' class="btn btn-info">Create student account</a>
 		<a href='@Url.Action("CreateStudentsGroup","Dean")' class="btn btn-info">Create accounts for group</a>
@@ -50,10 +56,10 @@
 						Practice diary not submitted
 					</div>
 				}
-				@if (user.Company != null)
+				@if (user.StudentCompanyIntern != null)
 				{
 					<div class="card-body">
-						Company Intern: @user.Company.Name <a href='@Url.Action("DeleteStudentFromCompanyIntern","Dean", new {userId = user.Id})' class="btn btn-danger">Delete company intern</a>
+						Company Intern: @user.StudentCompanyIntern.CompanyIntern.Name <a href='@Url.Action("DeleteStudentFromCompanyIntern","Dean", new {userId = user.Id})' class="btn btn-danger">Delete company intern</a>
 					</div>
 				}
 				else

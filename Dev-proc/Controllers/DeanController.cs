@@ -2,7 +2,9 @@
 using Dev_proc.Data;
 using Dev_proc.Models;
 using Dev_proc.Models.CompanyModels;
+using Dev_proc.Models.Data;
 using Dev_proc.Models.DeanModels;
+using Dev_proc.Models.Enums;
 using Dev_proc.Models.Identity;
 using Dev_proc.Models.ViewModels.DeanViews;
 using Microsoft.AspNetCore.Authorization;
@@ -145,13 +147,20 @@ namespace Dev_proc.Controllers
         }
         [Route("student_list")]
         [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
-        public async Task<IActionResult> StudentsList()
+        public async Task<IActionResult> StudentsList(PracticeDiaryStatus? practiceDiaryStatus = null)
         {
-            var students = await _context.Users
+            var students = practiceDiaryStatus == null
+                ? await _context.Users
                 .Include(u => u.Roles).ThenInclude(r => r.Role)
                 .Include(u => u.PracticeDiary)
-                .Include(u=>u.Company)
+                .Include(u => u.StudentCompanyIntern).ThenInclude(s => s.CompanyIntern)
                 .Where(u => u.Roles.Any(x => x.Role.Name == ApplicationRoleNames.Student))
+                .ToListAsync()
+                : await _context.Users
+                .Include(u => u.Roles).ThenInclude(r => r.Role)
+                .Include(u => u.PracticeDiary)
+                .Include(u => u.StudentCompanyIntern).ThenInclude(s => s.CompanyIntern)
+                .Where(u => u.Roles.Any(x => x.Role.Name == ApplicationRoleNames.Student) && u.PracticeDiary != null && u.PracticeDiary.PracticeDiaryStatus == practiceDiaryStatus)
                 .ToListAsync();
             return View(students);
 
@@ -277,25 +286,25 @@ namespace Dev_proc.Controllers
             var localUsers = await _context.Users.ToListAsync();
 
             foreach (var student in students)
-			{
-                if(student.Status == 2)//отчислен
-				{
+            {
+                if (student.Status == 2)//отчислен
+                {
                     continue;
-				}
+                }
                 var localUser = localUsers.Where(u => u.Email == student.Email).FirstOrDefault();
-                if(localUser != null)
-				{
+                if (localUser != null)
+                {
                     continue;
-				}
-				var user = new User
-				{
-					Email = student.Email,
-					UserName = student.Email,
-					Surname = student.LastName,
-					Secondname = student.Patronymic,
-					Firstname = student.FirstName,
-					EmailConfirmed = true,
-				};
+                }
+                var user = new User
+                {
+                    Email = student.Email,
+                    UserName = student.Email,
+                    Surname = student.LastName,
+                    Secondname = student.Patronymic,
+                    Firstname = student.FirstName,
+                    EmailConfirmed = true,
+                };
                 user.Roles = new List<UserRole>() { new UserRole { Role = role, User = user } };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded)
@@ -303,8 +312,8 @@ namespace Dev_proc.Controllers
                     continue;
                 }
             }
-			await _context.SaveChangesAsync();
-			TempData["Success"] = "Student accounts successfully created";
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Student accounts successfully created";
             return RedirectToAction("Index", "User");
         }
         [Route("{userId:guid}/add_student_to_company")]
@@ -313,17 +322,17 @@ namespace Dev_proc.Controllers
         public async Task<IActionResult> AddStudentToCompanyIntern(Guid userId)
         {
             var user = await _context.Users
-                .Include(u => u.Company)
+                .Include(u => u.StudentCompanyIntern)
                 .Where(u => u.Id == userId)
                 .FirstOrDefaultAsync();
 
-            if(user == null)
-			{
+            if (user == null)
+            {
                 return NotFound("User not found");
-			}
+            }
 
-            return View(new AddStudentToCompanyInternViewModel 
-            { 
+            return View(new AddStudentToCompanyInternViewModel
+            {
                 UserId = userId,
                 Companies = await _context.Companies.ToListAsync(),
                 Firstname = user.Firstname,
@@ -337,11 +346,11 @@ namespace Dev_proc.Controllers
         [HttpPost]
         public async Task<IActionResult> AddStudentToCompanyInternPost(AddStudentToCompanyInternViewModel model)
         {
-            if(model.CompanyId == null || (Guid.Empty == model.CompanyId))
-			{
+            if (model.CompanyId == null || (Guid.Empty == model.CompanyId))
+            {
                 TempData["Error"] = "Please select company";
                 return RedirectToAction("AddStudentToCompanyIntern", "Dean", new { userId = model.UserId });
-			}
+            }
             var user = await _context.Users
                 .Include(u => u.Company)
                 .Where(u => u.Id == model.UserId)
@@ -353,11 +362,18 @@ namespace Dev_proc.Controllers
             var company = await _context.Companies.Where(c => c.Id == model.CompanyId)
                 .FirstOrDefaultAsync();
             if (company == null)
-			{
+            {
                 return NotFound("Company not found");
             }
-            user.Company = company;
-            _context.Update(user);
+            var companyIntern = new StudentCompanyIntern
+            {
+                Student = user,
+                CompanyIntern = company
+            };
+            company.StudentCompanyIntern.Add(companyIntern);
+            _context.StudentCompanyInterns.Add(companyIntern);
+            user.StudentCompanyIntern = companyIntern;
+            _context.UpdateRange(user, company);
             await _context.SaveChangesAsync();
             TempData["Success"] = "Company intern added to student";
             return RedirectToAction("StudentsList", "Dean");
@@ -368,7 +384,7 @@ namespace Dev_proc.Controllers
         public async Task<IActionResult> DeleteStudentFromCompanyIntern(Guid userId)
         {
             var user = await _context.Users
-                .Include(u => u.Company)
+                .Include(u => u.StudentCompanyIntern)
                 .Where(u => u.Id == userId)
                 .FirstOrDefaultAsync();
 
@@ -376,8 +392,14 @@ namespace Dev_proc.Controllers
             {
                 return NotFound("User not found");
             }
+            if (user.StudentCompanyIntern == null)
+            {
+                return NotFound("Company intern not found");
+            }
 
-            user.Company = null;
+
+            _context.Remove(user.StudentCompanyIntern);
+            user.StudentCompanyIntern = null;
             _context.Update(user);
             await _context.SaveChangesAsync();
             TempData["Success"] = "Student deleted from company";

@@ -2,9 +2,10 @@
 @using Dev_proc.Models.Enums
 @using Dev_proc.Models.ViewModels.CandidacyViews
 @using Dev_proc.Models.ViewModels.PositionViews
-@model Dev_proc.Models.Identity.User
+@model StudentCandidacyView
 @{
 	ViewData["Title"] = "Companies Page";
+	CandidateStatus? candidateStatus = null;
 }
 
 @functions {
@@ -30,24 +31,30 @@
 
 	}
 }
-
 <div class="text-left">
-	@if(@Model.Candidatures?.Count == 0)
+	<form method="get">
+		<input type="hidden" name="userId" value="@Model.UserId" id="uploadCompanyId" />
+		<select name="candidateStatus" asp-items="Html.GetEnumSelectList<CandidateStatus>()">
+			<option value=@null>All</option>
+		</select>
+		<input type="submit" value="Sort" />
+	</form>
+	@if (@Model.Candidatures?.Count == 0)
 	{
-		<p><h2>Your candidatures list is empty</h2></p>	
+		<p><h2>Your candidatures list is empty</h2></p>
 		<p><a href='@Url.Action("CompaniesList","Company")' class="btn btn-primary">Companies</a></p>
 
 	}
 	@foreach (var candidature in @Model.Candidatures)
 	{
 		<p>
-		<div class="card mb-3">
-			<div class="card-header">Position name: @candidature.Position.Name @CshtmlHelper.AvailablePlacesToName(candidature.Position.AvailablePlaces)</div>
-			<div class="card-body">
-				<div class="card-text">Description: @candidature.Position.Description</div>			
+			<div class="card mb-3">
+				<div class="card-header">Position name: @candidature.Position.Name @CshtmlHelper.AvailablePlacesToName(candidature.Position.AvailablePlaces)</div>
+				<div class="card-body">
+					<div class="card-text">Description: @candidature.Position.Description</div>
+				</div>
 			</div>
-		</div>
-		<a href='@Url.Action("CheckYourCandidacy","Candidacy",new {userId = @Model.Id, positionId = candidature.Position.Id})' class="btn @candidatureStatus(candidature.Status)">Check</a>
+			<a href='@Url.Action("CheckYourCandidacy","Candidacy",new {userId = @Model.UserId, positionId = candidature.Position.Id})' class="btn @candidatureStatus(candidature.Status)">Check</a>
 		</p>
 		<hr />
 	}
