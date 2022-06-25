@@ -28,6 +28,12 @@
 }
 
 <div class="text-left">
+	@if (User.IsInRole(ApplicationRoleNames.Dean))
+	{
+		<p>
+			<a href='@Url.Action("CreateCompany","Dean")' class="btn btn-info">Create company account</a>
+		</p>
+	}
 	@foreach (var company in @Model)
 	{
 		var collapseId = $"collapseId{counter}";
