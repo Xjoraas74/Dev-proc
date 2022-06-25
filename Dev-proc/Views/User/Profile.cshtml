@@ -45,11 +45,11 @@
 				<p class="h4">@Model.Surname</p>
 				<p class="h4">@Model.Firstname</p>
 				<p class="h4">@Model.Secondname</p>
-				@if(@Model.Company != null)
+				@if (@Model.StudentCompanyIntern != null)
 				{
-					<p class="h4">Company intern: @Model.Company.Name</p>
+					<p class="h4">Company intern: @Model.StudentCompanyIntern.CompanyIntern.Name</p>
 				}
-				
+
 			</div>
 		</div>
 		@if (Model.Resume == null)
@@ -60,7 +60,7 @@
 				</div>
 			</div>
 		}
-		else if(User.IsInRole(ApplicationRoleNames.Student))
+		else if (User.IsInRole(ApplicationRoleNames.Student))
 		{
 			<div class="card">
 				<div class="card-body">
@@ -102,18 +102,23 @@
 	{
 		<p>
 			<a href='@Url.Action("StudentsList","Dean")' class="btn btn-primary">Students list</a>
-			<p>
-				<h4>Create accounts:</h4>
-			@if (User.IsInRole(ApplicationRoleNames.Administrator))
-			{
+		<p>
+			<h4>Create accounts:</h4>
+				@if (User.IsInRole(ApplicationRoleNames.Administrator))
+				{
 				<a href='@Url.Action("CreateDean","Dean")' class="btn btn-warning">Create dean profile</a>
-				
-			}
+
+				}
 			<a href='@Url.Action("CreateCompany","Dean")' class="btn btn-info">Create company account</a>
 			<a href='@Url.Action("CreateStudent","Dean")' class="btn btn-info">Create student account</a>
 			<a href='@Url.Action("CreateStudentsGroup","Dean")' class="btn btn-info">Create accounts for group</a>
-			</p>
+		</p>
 		</p>
 	}
+	<div class="row align-items-end">
+		<div class="col">
+			<a href='@Url.Action("ChangePassword","User")' class="btn btn-primary">Change password</a>
+		</div>
+	</div>
 
 </div>

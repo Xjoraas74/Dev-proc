@@ -3,6 +3,7 @@ using Dev_proc.Data;
 using Dev_proc.Models.Data;
 using Dev_proc.Models.Identity;
 using Dev_proc.Models.ViewModels;
+using Dev_proc.Models.ViewModels.UserViews;
 using Dev_proc.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -51,6 +52,7 @@ namespace Dev_proc.Controllers
             User? currentUser = await _userManager.Users
                 .Include(u => u.Resume)
                 .Include(u=>u.PracticeDiary)
+                .Include(u=>u.StudentCompanyIntern).ThenInclude(s=>s.CompanyIntern)
                 .Include(u => u.Company).ThenInclude(c => c.Positions)
                 .Include(u => u.Dean)
                 .Where(u => u.Id == Guid.Parse(userId))
@@ -70,6 +72,7 @@ namespace Dev_proc.Controllers
             }
             var user = await _context.Users
                 .Include(u => u.Resume)
+                .Include(u => u.StudentCompanyIntern).ThenInclude(s => s.CompanyIntern)
                 .Include(u => u.PracticeDiary)
                 .Include(u=>u.Company).ThenInclude(c=>c.Positions)
                 .Include(u=>u.Dean)
@@ -252,5 +255,34 @@ namespace Dev_proc.Controllers
 
             return PhysicalFile(file_path, "application/pdf", user.PracticeDiary.Name);
         }
+        [Route("change_password")]
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ChangePassword(Guid userId)
+        {
+            return View(new ChangePasswordViewModel { });
+        }
+        [Route("change_password")]
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if(user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = "Something wrong =)";
+                return this.View(model);
+            }
+            await _signInManager.RefreshSignInAsync(user);
+            TempData["Success"] = "Password changed";
+            return RedirectToAction("Index");
+        }
+
     }
 }
