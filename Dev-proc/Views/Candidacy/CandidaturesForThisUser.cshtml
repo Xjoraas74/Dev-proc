@@ -8,29 +8,6 @@
 	CandidateStatus? candidateStatus = null;
 }
 
-@functions {
-	public string candidatureStatus(CandidateStatus status)
-	{
-		switch (status)
-		{
-			case CandidateStatus.New:
-				return "btn-primary";
-			case CandidateStatus.InProcess:
-				return "btn-warning";
-			case CandidateStatus.Accepted:
-				return "btn-success";
-			case CandidateStatus.Denied:
-				return "btn-danger";
-			case CandidateStatus.Undefiend:
-				return "btn-dark";
-			case CandidateStatus.Offer:
-				return "btn-info";
-			default:
-				return "btn-light";
-		}
-
-	}
-}
 <div class="text-left">
 	<form method="get">
 		<input type="hidden" name="userId" value="@Model.UserId" id="uploadCompanyId" />
@@ -54,7 +31,7 @@
 					<div class="card-text">Description: @candidature.Position.Description</div>
 				</div>
 			</div>
-			<a href='@Url.Action("CheckYourCandidacy","Candidacy",new {userId = @Model.UserId, positionId = candidature.Position.Id})' class="btn @candidatureStatus(candidature.Status)">Check</a>
+			<a href='@Url.Action("CheckYourCandidacy","Candidacy",new {userId = @Model.UserId, positionId = candidature.Position.Id})' class="btn @CshtmlHelper.CandidatureStatusColor(candidature.Status)">Check</a>
 		</p>
 		<hr />
 	}

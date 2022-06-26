@@ -56,7 +56,7 @@
 						Practice diary not submitted
 					</div>
 				}
-				@if (user.StudentCompanyIntern != null)
+				@*@if (user.StudentCompanyIntern != null)
 				{
 					<div class="card-body">
 						Company Intern: @user.StudentCompanyIntern.CompanyIntern.Name <a href='@Url.Action("DeleteStudentFromCompanyIntern","Dean", new {userId = user.Id})' class="btn btn-danger">Delete company intern</a>
@@ -67,7 +67,7 @@
 					<div class="card-body">
 						Company Intern: <a href='@Url.Action("AddStudentToCompanyIntern","Dean", new {userId = user.Id})' class="btn btn-light">Add company Intern</a>
 					</div>
-				}
+				}*@
 
 			</div>
 		</p>

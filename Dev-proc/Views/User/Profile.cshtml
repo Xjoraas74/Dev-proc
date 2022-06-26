@@ -18,18 +18,28 @@
 				<a href='@Url.Action("ApplicationsForThisCompany","Position", new {companyId = @Model.Company.Id})' class="btn btn-secondary">All candidates</a>
 			}
 		</p>
-		@foreach (var position in @Model.Company.Positions)
+		@if (@Model.Company.Positions.Count() != 0)
 		{
+			<a class="h4" data-bs-toggle="collapse" href="#collapsePosition" role="button" aria-expanded="false" aria-controls="collapsePosition">
+				Positions↓
+			</a>
 			<p>
-				<div class="card mb-3">
-					<div class="card-header">@position.Name @CshtmlHelper.AvailablePlacesToName(position.AvailablePlaces)</div>
-					<div class="card-body">
-						<div class="card-text">@position.Description</div>
-					</div>
+				<div class="collapse" id="collapsePosition">
+					@foreach (var position in @Model.Company.Positions)
+					{
+						<p>
+							<div class="card mb-3">
+								<div class="card-header">@position.Name @CshtmlHelper.AvailablePlacesToName(position.AvailablePlaces)</div>
+								<div class="card-body">
+									<div class="card-text">@position.Description</div>
+								</div>
+							</div>
+							<a href='@Url.Action("EditPosition","Position",new {positionId = position.Id})' class="btn btn-info">Edit</a>
+							<a href='@Url.Action("DeletePosition","Position",new {positionId = position.Id})' class="btn btn-danger">Delete</a>
+							<a href='@Url.Action("ApplicationsForThisPosition","Position",new {positionId = position.Id})' class="btn btn-secondary">Candidates</a>
+						</p>
+					}
 				</div>
-				<a href='@Url.Action("EditPosition","Position",new {positionId = position.Id})' class="btn btn-info">Edit</a>
-				<a href='@Url.Action("DeletePosition","Position",new {positionId = position.Id})' class="btn btn-danger">Delete</a>
-				<a href='@Url.Action("ApplicationsForThisPosition","Position",new {positionId = position.Id})' class="btn btn-secondary">Candidates</a>
 			</p>
 		}
 	}
@@ -101,19 +111,21 @@
 	@if (User.IsInRole(ApplicationRoleNames.Dean) || User.IsInRole(ApplicationRoleNames.Administrator))
 	{
 		<p>
-			<a href='@Url.Action("StudentsList","Dean")' class="btn btn-primary">Students list</a>
+			<a href='@Url.Action("StudentsPracticeDiaryList","Dean")' class="btn btn-primary">Students practice diary</a>
+			<a href='@Url.Action("StudentsOffersList","Dean")' class="btn btn-primary">Offers for students</a>
+		</p>
 		<p>
 			<h4>Create accounts:</h4>
-				@if (User.IsInRole(ApplicationRoleNames.Administrator))
-				{
+			@if (User.IsInRole(ApplicationRoleNames.Administrator))
+			{
 				<a href='@Url.Action("CreateDean","Dean")' class="btn btn-warning">Create dean profile</a>
 
-				}
+			}
 			<a href='@Url.Action("CreateCompany","Dean")' class="btn btn-info">Create company account</a>
 			<a href='@Url.Action("CreateStudent","Dean")' class="btn btn-info">Create student account</a>
 			<a href='@Url.Action("CreateStudentsGroup","Dean")' class="btn btn-info">Create accounts for group</a>
 		</p>
-		</p>
+
 	}
 	<div class="row align-items-end">
 		<h4>Change password:</h4>

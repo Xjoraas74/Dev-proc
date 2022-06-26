@@ -45,7 +45,13 @@
 						@if (User.IsInRole(ApplicationRoleNames.Dean) && userId != null)
 						{
 							<li class="nav-item">
-								<a href='@Url.Action("StudentsList","Dean")' class="nav-link text-dark">Students list</a>
+								<a href='@Url.Action("StudentsPracticeDiaryList","Dean")' class="nav-link text-dark">Students practice diary</a>
+							</li>
+						}
+						@if (User.IsInRole(ApplicationRoleNames.Dean) && userId != null)
+						{
+							<li class="nav-item">
+								<a href='@Url.Action("StudentsOffersList","Dean")' class="nav-link text-dark">Offers for students</a>
 							</li>
 						}
 					</ul>

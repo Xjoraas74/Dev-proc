@@ -145,9 +145,9 @@ namespace Dev_proc.Controllers
             TempData["Success"] = "Dean profile created";
             return RedirectToAction("Index", "User");
         }
-        [Route("student_list")]
+        [Route("students_practice_diary_list")]
         [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
-        public async Task<IActionResult> StudentsList(PracticeDiaryStatus? practiceDiaryStatus = null)
+        public async Task<IActionResult> StudentsPracticeDiaryList(PracticeDiaryStatus? practiceDiaryStatus = null)
         {
             var students = practiceDiaryStatus == null
                 ? await _context.Users
@@ -215,7 +215,7 @@ namespace Dev_proc.Controllers
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
             TempData["Success"] = "Practice diary updated";
-            return RedirectToAction("StudentsList");
+            return RedirectToAction("StudentsPracticeDiaryList");
         }
 
         [Route("{userId:guid}/your_practice_diary")]
@@ -341,46 +341,78 @@ namespace Dev_proc.Controllers
             });
         }
 
-        [Route("add_student_to_company")]
+        [Route("add_student_to_company/{candidatureId:guid}")]
         [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
-        [HttpPost]
-        public async Task<IActionResult> AddStudentToCompanyInternPost(AddStudentToCompanyInternViewModel model)
+        public async Task<IActionResult> AddStudentToCompanyInternPost(Guid candidatureId)
         {
-            if (model.CompanyId == null || (Guid.Empty == model.CompanyId))
+            var candidature = await _context.Candidatures
+                .Include(c=>c.User).ThenInclude(u=>u.StudentCompanyIntern)
+                .Include(p=>p.Position).ThenInclude(p=>p.Company)
+                .Where(c => c.Id == candidatureId).FirstOrDefaultAsync();
+            if(candidature == null)
             {
-                TempData["Error"] = "Please select company";
-                return RedirectToAction("AddStudentToCompanyIntern", "Dean", new { userId = model.UserId });
+                return NotFound("Candidature not found");
             }
-            var user = await _context.Users
-                .Include(u => u.Company)
-                .Where(u => u.Id == model.UserId)
-                .FirstOrDefaultAsync();
-            if (user == null)
+            var user = candidature.User;
+            var company = candidature.Position.Company;
+            if (user.StudentCompanyIntern != null)
             {
-                return NotFound("User not found");
-            }
-            var company = await _context.Companies.Where(c => c.Id == model.CompanyId)
-                .FirstOrDefaultAsync();
-            if (company == null)
-            {
-                return NotFound("Company not found");
+                TempData["Error"] = "User alread in company";
+                return RedirectToAction("CheckYourCandidacy", "Candidacy", new { userId = user.Id, positionId = candidature.Position.Id });
             }
             var companyIntern = new StudentCompanyIntern
             {
                 Student = user,
                 CompanyIntern = company
             };
+            candidature.Status = CandidateStatus.Accepted;
             company.StudentCompanyIntern.Add(companyIntern);
             _context.StudentCompanyInterns.Add(companyIntern);
             user.StudentCompanyIntern = companyIntern;
-            _context.UpdateRange(user, company);
+            _context.UpdateRange(user, company, candidature);
             await _context.SaveChangesAsync();
             TempData["Success"] = "Company intern added to student";
-            return RedirectToAction("StudentsList", "Dean");
+            return RedirectToAction("CheckYourCandidacy", "Candidacy", new {userId = user.Id, positionId= candidature.Position.Id});
         }
+        //[Route("add_student_to_company")]
+        //[Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
+        //[HttpPost]
+        //public async Task<IActionResult> AddStudentToCompanyInternPost()
+        //{
+        //    if (model.CompanyId == null || (Guid.Empty == model.CompanyId))
+        //    {
+        //        TempData["Error"] = "Please select company";
+        //        return RedirectToAction("AddStudentToCompanyIntern", "Dean", new { userId = model.UserId });
+        //    }
+        //    var user = await _context.Users
+        //        .Include(u => u.Company)
+        //        .Where(u => u.Id == model.UserId)
+        //        .FirstOrDefaultAsync();
+        //    if (user == null)
+        //    {
+        //        return NotFound("User not found");
+        //    }
+        //    var company = await _context.Companies.Where(c => c.Id == model.CompanyId)
+        //        .FirstOrDefaultAsync();
+        //    if (company == null)
+        //    {
+        //        return NotFound("Company not found");
+        //    }
+        //    var companyIntern = new StudentCompanyIntern
+        //    {
+        //        Student = user,
+        //        CompanyIntern = company
+        //    };
+        //    company.StudentCompanyIntern.Add(companyIntern);
+        //    _context.StudentCompanyInterns.Add(companyIntern);
+        //    user.StudentCompanyIntern = companyIntern;
+        //    _context.UpdateRange(user, company);
+        //    await _context.SaveChangesAsync();
+        //    TempData["Success"] = "Company intern added to student";
+        //    return RedirectToAction("StudentsList", "Dean");
+        //}
         [Route("{userId:guid}/delete_student_from_company")]
         [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
-        [HttpGet]
         public async Task<IActionResult> DeleteStudentFromCompanyIntern(Guid userId)
         {
             var user = await _context.Users
@@ -394,16 +426,40 @@ namespace Dev_proc.Controllers
             }
             if (user.StudentCompanyIntern == null)
             {
-                return NotFound("Company intern not found");
+                TempData["Error"] = "The student is not an intern at the company";
+                return RedirectToAction("StudentsOffersList");
             }
 
-
+            var candidatures = await _context.Candidatures.Where(c => c.UserId == userId && c.Status == CandidateStatus.Accepted).ToListAsync();
+            foreach (var candidature in candidatures)
+            {
+                candidature.Status = CandidateStatus.Undefiend;
+            }
             _context.Remove(user.StudentCompanyIntern);
             user.StudentCompanyIntern = null;
-            _context.Update(user);
+            _context.UpdateRange(user);
             await _context.SaveChangesAsync();
             TempData["Success"] = "Student deleted from company";
-            return RedirectToAction("StudentsList", "Dean");
+            return RedirectToAction("StudentsOffersList");
+        }
+        [Route("students_company_offers_list")]
+        [Authorize(Roles = ApplicationRoleNames.AdminAndDean)]
+        public async Task<IActionResult> StudentsOffersList(CandidateStatus? status = null)
+        {
+
+            var students = status == null
+                ? await _context.Users
+                .Include(u => u.Candidatures).ThenInclude(c => c.Position).ThenInclude(p => p.Company)
+                .Include(u => u.StudentCompanyIntern).ThenInclude(s => s.CompanyIntern)
+                .Where(u => u.Candidatures.Any(c => c.Status == CandidateStatus.Offer || c.Status == CandidateStatus.Accepted))
+                .ToListAsync()
+                : await _context.Users
+                .Include(u => u.Candidatures).ThenInclude(c => c.Position).ThenInclude(p => p.Company)
+                .Include(u => u.StudentCompanyIntern).ThenInclude(s => s.CompanyIntern)
+                .Where(u => u.Candidatures.Any(c => c.Status == status))
+                .ToListAsync();
+            return View(students);
+            //TODO доделать вьюшку StudentsOffersList
         }
     }
 }

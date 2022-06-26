@@ -4,6 +4,14 @@
 @model CandidacyViewModel
 @{
 	ViewData["Title"] = "Companies Page";
+	var selectList = Enum.GetValues(typeof(CandidateStatus))
+								.Cast<CandidateStatus>()
+								.Where(e => e != CandidateStatus.Accepted)
+								.Select(e => new SelectListItem
+							   {
+								   Value = ((int)e).ToString(),
+								   Text = e.ToString()
+							   });
 }
 
 <form asp-action="CheckCandidature" asp-controller="Candidacy" method="post" enctype="multipart/form-data">
@@ -21,13 +29,22 @@
 	{
 		<p class="h4">User deleted his resume</p>
 	}
-	<p>
-		<select asp-for="CandidateStatus" asp-items="Html.GetEnumSelectList<CandidateStatus>()" class="form-control"></select>
-	</p>
-	<p>
-		<textarea asp-for="Comment" type="text" placeholder="Comment" value="@Model.Comment" class="form-control" rows="3"></textarea>
-	</p>
-	<p>
-		<input type="submit" value="Save" />
-	</p>
+	@if (@Model.CandidateStatus == CandidateStatus.Accepted)
+	{
+		<p class="fs-1">Student already in your company, contact the dean to remove the student</p>
+		<a href='@Url.Action("Index","User")' class="btn btn-primary">Back to profile</a>
+	}
+	else
+	{
+		<p>
+			<select asp-for="CandidateStatus" asp-items="selectList" class="form-control"></select>
+		</p>
+		<p>
+			<textarea asp-for="Comment" type="text" placeholder="Comment" value="@Model.Comment" class="form-control" rows="3"></textarea>
+		</p>
+		<p>
+			<input type="submit" value="Save" />
+		</p>
+	}
+
 </form>

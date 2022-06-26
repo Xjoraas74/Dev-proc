@@ -1,0 +1,106 @@
+﻿@using Dev_proc.Constants
+@using Dev_proc.Constants.Configuration
+@using Dev_proc.Models.CompanyModels
+@using Dev_proc.Models.Enums
+@using Dev_proc.Models.Identity
+@using Microsoft.AspNetCore.Identity
+@model List<User>
+@{
+}
+@functions {
+
+}
+
+<div class="text-left">
+	<form method="get">
+		<select name="status" >
+			<option value=@null>All</option>
+			<option value=@CandidateStatus.Offer>Offer</option>
+			<option value=@CandidateStatus.Accepted>Accepted</option>
+		</select>
+		<input type="submit" value="Sort" />
+	</form>
+
+	@foreach (var student in @Model)
+	{
+		<p>
+			<div class="card mb-3">
+				<div class="card-header">
+					<p>
+						@student.Surname @student.Firstname @student.Secondname
+					</p>
+
+					@if (student.StudentCompanyIntern != null)
+					{
+						<p>
+							Company intern: @student.StudentCompanyIntern.CompanyIntern.Name 
+							<a href='@Url.Action("DeleteStudentFromCompanyIntern","Dean", new {userId = student.Id})' class="btn btn-danger">Delete from company</a>
+						</p>
+					}
+					else
+					{
+						<p>
+							The student is not an intern at the company
+						</p>
+					}
+
+
+				</div>
+
+				<div class="card-body">
+					@{
+						var offers = student.Candidatures.Where(c => c.Status == CandidateStatus.Offer);
+						var accepts = student.Candidatures.Where(c => c.Status == CandidateStatus.Accepted);
+					}
+					@if (offers.Count() != 0)
+					{
+						<h3>Offers:</h3>
+						@foreach (var offer in offers)
+						{
+							<p class="fs-5">
+								Company: @offer.Position.Company.Name | Position: @offer.Position.Name
+								<a href='@Url.Action("CheckYourCandidacy","Candidacy", new {userId = student.Id,positionId = offer.Position.Id})' class="btn btn-primary">Check offer</a>
+							</p>
+						}
+					}
+					@if (accepts.Count() != 0)
+					{
+						<h3>Accepted:</h3>
+						@foreach (var accept in accepts)
+						{
+							<p class="fs-5">
+								Company: @accept.Position.Company.Name | Position: @accept.Position.Name
+								<a href='@Url.Action("CheckYourCandidacy","Candidacy", new {userId = student.Id,positionId = accept.Position.Id})' class="btn btn-primary">Check</a>
+							</p>
+						}
+					}
+				</div>
+			</div>
+		</p>
+
+	}
+	@*@foreach (var user in @Model)
+		{
+
+		<p>
+		<div class="card mb-3">
+		<div class="card-header">@user.Surname @user.Firstname @user.Secondname</div>
+		@if (user.PracticeDiary != null)
+		{
+		<div class="card-body">
+		Practice Diary status: <a href='@Url.Action("UserPracticeDiary","Dean", new {userId = user.Id})' class="btn @practiceDiaryStatus(@user.PracticeDiary.PracticeDiaryStatus)">Practice diary</a>
+		</div>
+		}
+		else
+		{
+		<div class="card-body">
+		Practice diary not submitted
+		</div>
+		}
+		</div>
+		</p>
+
+
+		}*@
+</div>
+

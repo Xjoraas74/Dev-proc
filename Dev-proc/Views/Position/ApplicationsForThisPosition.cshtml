@@ -5,27 +5,7 @@
 @{
 	ViewData["Title"] = "Companies Page";
 }
-@functions{
-	public string candidatureStatus(CandidateStatus status)
-	{
-		switch (status)
-		{
-			case CandidateStatus.New:
-				return "btn-primary";
-			case CandidateStatus.InProcess:
-				return "btn-warning";
-			case CandidateStatus.Accepted:
-				return "btn-success";
-			case CandidateStatus.Denied:
-				return "btn-danger";
-			case CandidateStatus.Undefiend:
-				return "btn-dark";
-			default:
-				return "btn-info";
-		}
 
-	}	
-}
 
 <div class="text-left">
 
@@ -41,7 +21,7 @@
 				@foreach (var application in position.Applications)
 				{
 					<div class="card-body">
-						<a href='@Url.Action("GetCandidature","Candidacy",new {candidatureId = application.Id})' class="btn @candidatureStatus(application.Status)">@application.User.Email</a>
+						<a href='@Url.Action("GetCandidature","Candidacy",new {candidatureId = application.Id})' class="btn @CshtmlHelper.CandidatureStatusColor(application.Status)">@application.User.Email</a>
 					</div>
 				}				
 			</div>
