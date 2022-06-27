@@ -66,7 +66,8 @@
 		{
 			<div class="card">
 				<div class="card-body">
-					<a href='@Url.Action("UploadResumeForStudent", new {userId = @Model.Id})'>Upload Resume</a>
+					<p class="h4">Resume</p>
+					<a href='@Url.Action("UploadResumeForStudent", new {userId = @Model.Id})' class="btn btn-primary">Upload Resume</a>
 				</div>
 			</div>
 		}
@@ -84,28 +85,30 @@
 				</div>
 			</div>
 		}
-		@if (Model.PracticeDiary == null)
-		{
-			<div class="card">
-				<div class="card-body">
-					<a href='@Url.Action("UploadPracticeDiaryForStudent", new {userId = @Model.Id})'>Upload practice diary</a>
-				</div>
-			</div>
-		}
-		else
-		{
-			<div class="card">
-				<div class="card-body">
-					<p class="h4">Practice diary</p>
+
+		<div class="card">
+			<div class="card-body">
+				<p class="h4">Practice diary</p>
+				@if (Model.PracticeDiary?.Path == null)
+				{
+					<a href='@Url.Action("UploadPracticeDiaryForStudent", new {userId = @Model.Id})' class="btn btn-primary">Upload practice diary</a>
+					@if (Model.PracticeDiary?.PracticeDiaryStatus != null)
+					{
+						<a href='@Url.Action("StudentCheckPracticeDiary","Dean", new {userId = @Model.Id})' class="btn btn-primary">Check practice diary status</a>
+					}
+				}
+				else
+				{
 					<p>@Model.PracticeDiary.Name</p>
 					<p>
 						<a href='@Url.Action("DeletePracticeDiaryForStudent", new {userId = @Model.Id})' class="btn btn-danger">Delete practice diary</a>
 						<a href='@Url.Action("DownloadPracticeDiary", new {userId = @Model.Id})' class="btn btn-info">Download practice diary</a>
 						<a href='@Url.Action("StudentCheckPracticeDiary","Dean", new {userId = @Model.Id})' class="btn btn-primary">Check practice diary status</a>
 					</p>
-				</div>
+				}
 			</div>
-		}
+		</div>
+
 
 	}
 	@if (User.IsInRole(ApplicationRoleNames.Dean) || User.IsInRole(ApplicationRoleNames.Administrator))

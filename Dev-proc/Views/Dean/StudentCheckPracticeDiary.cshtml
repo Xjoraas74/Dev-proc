@@ -8,7 +8,7 @@
 
 <div class="text-left">
 	<p class="h4">Student name: @Model.Surname @Model.Firstname @Model.Secondname</p>
-	@if (@Model.PracticeDiary != null)
+	@if (@Model.PracticeDiary?.Path != null)
 	{
 		<p class="h4">
 			User resume: @Model.PracticeDiary.Name
@@ -17,7 +17,7 @@
 	}
 	else
 	{
-		<p class="h4">Student deleted his pracitce diary</p>
+		<p class="h4">Student deleted his practice diary</p>
 	}
 	<p>
 		<select asp-for="PracticeDiaryStatus" asp-items="Html.GetEnumSelectList<PracticeDiaryStatus>()" class="form-control" disabled></select>

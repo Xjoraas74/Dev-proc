@@ -451,15 +451,14 @@ namespace Dev_proc.Controllers
                 ? await _context.Users
                 .Include(u => u.Candidatures).ThenInclude(c => c.Position).ThenInclude(p => p.Company)
                 .Include(u => u.StudentCompanyIntern).ThenInclude(s => s.CompanyIntern)
-                .Where(u => u.Candidatures.Any(c => c.Status == CandidateStatus.Offer || c.Status == CandidateStatus.Accepted))
+                .Where(u => (u.Candidatures.Any(c => c.Status == CandidateStatus.Offer || c.Status == CandidateStatus.Accepted)) || (u.StudentCompanyIntern.CompanyIntern != null))
                 .ToListAsync()
                 : await _context.Users
                 .Include(u => u.Candidatures).ThenInclude(c => c.Position).ThenInclude(p => p.Company)
                 .Include(u => u.StudentCompanyIntern).ThenInclude(s => s.CompanyIntern)
-                .Where(u => u.Candidatures.Any(c => c.Status == status))
+                .Where(u => u.Candidatures.Any(c => c.Status == status)) 
                 .ToListAsync();
             return View(students);
-            //TODO доделать вьюшку StudentsOffersList
         }
     }
 }

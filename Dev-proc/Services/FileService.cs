@@ -93,9 +93,8 @@ namespace Dev_proc.Services
                 throw new ArgumentNullException(nameof(user));
             }
             DeleteFile(practiceDiary.Path);
-            user.PracticeDiary = null;
-            user.PracticeDiaryId = null;
-            _context.PracticeDiaries.Remove(practiceDiary);
+            user.PracticeDiary.Path = null;
+            user.PracticeDiary.Name = null;
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
@@ -117,7 +116,7 @@ namespace Dev_proc.Services
             }
             if (student.PracticeDiary?.Name != null || student.PracticeDiary?.Path != null)
             {
-                throw new Exception("Resume already exists");
+                throw new Exception("Practice diary already exists");
             }
 
             string path = FolderPaths.PracticeDiaryFolder + practiceDiary.StudentId.ToString();
@@ -127,9 +126,18 @@ namespace Dev_proc.Services
             {
                 await practiceDiary.Resume.CopyToAsync(fileStream);
             }
-            PracticeDiary file = new PracticeDiary { Name = practiceDiary.Resume.FileName, Path = path, PracticeDiaryStatus = PracticeDiaryStatus.New, User = student };
-            await _context.PracticeDiaries.AddAsync(file);
-            student.PracticeDiary = file;
+            if (student.PracticeDiary == null) 
+            { 
+                PracticeDiary file = new PracticeDiary { Name = practiceDiary.Resume.FileName, Path = path, PracticeDiaryStatus = PracticeDiaryStatus.New, User = student };
+                await _context.PracticeDiaries.AddAsync(file);
+                student.PracticeDiary = file;
+            }
+            else
+            {
+                student.PracticeDiary.Path = path;
+                student.PracticeDiary.Name = practiceDiary.Resume.FileName;
+            }
+            
             _context.Users.Update(student);
             await _context.SaveChangesAsync();
         }

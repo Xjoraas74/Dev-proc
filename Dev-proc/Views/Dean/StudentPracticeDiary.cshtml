@@ -9,7 +9,7 @@
 <form asp-action="CheckUserPracticeDiary" asp-controller="Dean" method="post" enctype="multipart/form-data">
 	<input type="hidden" asp-for="UserId" value="@Model.UserId" id="uploadCompanyId" />
 	<p class="h4">Student name: @Model.Surname @Model.Firstname @Model.Secondname</p>
-	@if (@Model.PracticeDiary != null)
+	@if (@Model.PracticeDiary?.Path != null)
 	{
 		<p class="h4">
 			User resume: @Model.PracticeDiary.Name
@@ -18,7 +18,7 @@
 	}
 	else
 	{
-		<p class="h4">Student deleted his pracitce diary</p>
+		<p class="h4">Student deleted his practice diary</p>
 	}
 	<p>
 		<select asp-for="PracticeDiaryStatus" asp-items="Html.GetEnumSelectList<PracticeDiaryStatus>()" class="form-control"></select>
